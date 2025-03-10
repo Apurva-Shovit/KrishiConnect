@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+
     <!-- add the above line to make sure that the graph works -->
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
@@ -175,11 +177,24 @@
                                             <%= request.location %>
                                             <span style="margin-left: 12px;">Proposals: <%= request.proposals %></span>
                                         </div>
-                                        <form method="POST" action="/accept-request">
-                                            <input type="hidden" name="request_id" value="<%= request.id %>">
-                                            <button type="submit" class="btn btn-success">Accept Request</button>
-                                        </form>
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-success" 
+                                            onclick="openRequestDetails(
+                                                '<%= request.buyer_name %>', 
+                                                '<%= request.buyer_location %>', 
+                                                '<%= request.buyer_company %>', 
+                                                '<%= request.crop_name %>',
+                                                '<%= request.quantity %>',
+                                                '<%= request.offer_price %>',
+                                                '<%= request.total_amount %>',
+                                                '<%= request.id %>'
+                                            )">
+                                            Accept Request
+                                        </button>
                                     </div>
+                                    
+                                    
                                     
                                 </div>
                             </div>
@@ -268,178 +283,196 @@
     </div>
 
     <!-- Chatbot Icon -->
-    <div id="chatbot-icon" onclick="toggleChat()" style="
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 55px;
-        height: 55px;
-        background-color: #0084ff;
+<!-- Chatbot Icon -->
+<div id="chatbot-icon" onclick="toggleChat()" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 55px;
+    height: 55px;
+    background-color: #3d6a25;
+    color: white;
+    font-size: 26px;
+    text-align: center;
+    line-height: 55px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 14px rgba(0, 0, 0, 0.4)';" 
+   onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.3)';">
+    💬
+</div>
+
+<!-- Chat Window -->
+<div id="chat-window" style="
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 360px;
+    height: 420px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+">
+    <!-- Chat Header -->
+    <div id="chat-header" style="
+        background: #3d6a25;
         color: white;
-        font-size: 26px;
-        text-align: center;
-        line-height: 55px;
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    " onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 14px rgba(0, 0, 0, 0.4)';" 
-       onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.3)';">
-        💬
-    </div>
-
-    <!-- Chat Window -->
-    <div id="chat-window" style="
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        width: 360px;
-        height: 420px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        display: none;
-        flex-direction: column;
-        overflow: hidden;
-        transform: translateY(20px);
-        opacity: 0;
-        transition: opacity 0.3s ease, transform 0.3s ease;
+        padding: 12px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 16px;
     ">
-        <div id="chat-header" style="
-            background: #0084ff;
+        <span>AgriBuddy</span>
+        <button id="close-chat" style="
+            background: transparent;
+            border: none;
             color: white;
-            padding: 12px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 16px;
-        ">
-            <span>AgriBuddy</span>
-            <button id="close-chat" style="
-                background: transparent;
-                border: none;
-                color: white;
-                font-size: 18px;
-                cursor: pointer;
-            ">✖</button>
-        </div>
-        <div id="chat-body" style="
-            flex: 1;
-            padding: 12px;
-            overflow-y: auto;
-            background: #f9f9f9;
-            display: flex;
-            flex-direction: column;
-        "></div>
-        <div id="chat-footer" style="
-            display: flex;
-            padding: 10px;
-            background: #fff;
-            border-top: 1px solid #ddd;
-        ">
-            <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)" style="
-                flex: 1;
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 8px;
-                outline: none;
-                font-size: 14px;
-            ">
-            <button id="send-btn" style="
-                margin-left: 10px;
-                padding: 10px 14px;
-                background: #0084ff;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: background 0.3s ease;
-            " onmouseover="this.style.background='#006bd6';" onmouseout="this.style.background='#0084ff';">
-                Send
-            </button>
-        </div>
+            font-size: 18px;
+            cursor: pointer;
+        ">✖</button>
     </div>
 
-    <script>
-        const chatButton = document.getElementById("chatbot-icon");
-        const chatWindow = document.getElementById("chat-window");
-        const closeChat = document.getElementById("close-chat");
-        const chatBody = document.getElementById("chat-body");
-        const userInput = document.getElementById("user-input");
-        const sendButton = document.getElementById("send-btn");
+    <!-- Chat Body -->
+    <div id="chat-body" style="
+        flex: 1;
+        padding: 12px;
+        overflow-y: auto;
+        background: #f9f9f9;
+        display: flex;
+        flex-direction: column;
+    "></div>
 
-        function toggleChat() {
-            if (chatWindow.style.display === "none" || chatWindow.style.opacity === "0") {
-                chatWindow.style.display = "flex";
-                setTimeout(() => {
-                    chatWindow.style.opacity = "1";
-                    chatWindow.style.transform = "translateY(0)";
-                }, 10);
-            } else {
-                chatWindow.style.opacity = "0";
-                chatWindow.style.transform = "translateY(20px)";
-                setTimeout(() => {
-                    chatWindow.style.display = "none";
-                }, 300);
-            }
-        }
+    <!-- Chat Footer -->
+    <div id="chat-footer" style="
+        display: flex;
+        padding: 10px;
+        background: #fff;
+        border-top: 1px solid #ddd;
+    ">
+        <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)" style="
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        ">
+        <button id="send-btn" style="
+            margin-left: 10px;
+            padding: 10px 14px;
+            background: #3d6a25;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        " onmouseover="this.style.background='#2c4f1a';" 
+           onmouseout="this.style.background='#3d6a25';">
+            Send
+        </button>
+    </div>
+</div>
 
-        closeChat.addEventListener("click", () => {
+<!-- Markdown Converter -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+
+<script>
+    const chatButton = document.getElementById("chatbot-icon");
+    const chatWindow = document.getElementById("chat-window");
+    const closeChat = document.getElementById("close-chat");
+    const chatBody = document.getElementById("chat-body");
+    const userInput = document.getElementById("user-input");
+    const sendButton = document.getElementById("send-btn");
+
+    // Initialize Markdown converter
+    const converter = new showdown.Converter();
+
+    function toggleChat() {
+        if (chatWindow.style.display === "none" || chatWindow.style.opacity === "0") {
+            chatWindow.style.display = "flex";
+            setTimeout(() => {
+                chatWindow.style.opacity = "1";
+                chatWindow.style.transform = "translateY(0)";
+            }, 10);
+        } else {
             chatWindow.style.opacity = "0";
             chatWindow.style.transform = "translateY(20px)";
             setTimeout(() => {
                 chatWindow.style.display = "none";
             }, 300);
-        });
-
-        function addMessage(sender, message) {
-            const messageElement = document.createElement("div");
-            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
-            messageElement.style.cssText = `
-                padding: 8px 12px;
-                margin: 5px 0;
-                border-radius: 8px;
-                max-width: 75%;
-                background: ${sender === "You" ? "#0084ff" : "#e0e0e0"};
-                color: ${sender === "You" ? "white" : "#333"};
-                align-self: ${sender === "You" ? "flex-end" : "flex-start"};
-            `;
-            chatBody.appendChild(messageElement);
-            chatBody.scrollTop = chatBody.scrollHeight;
         }
+    }
 
-        async function sendMessage() {
-            const userMessage = userInput.value.trim();
-            if (!userMessage) return;
+    closeChat.addEventListener("click", () => {
+        chatWindow.style.opacity = "0";
+        chatWindow.style.transform = "translateY(20px)";
+        setTimeout(() => {
+            chatWindow.style.display = "none";
+        }, 300);
+    });
 
-            addMessage("You", userMessage);
-            userInput.value = "";
+    function displayMessage(sender, text, className) {
+        let msgDiv = document.createElement("div");
 
-            try {
-                const response = await fetch("http://localhost:5000/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: userMessage }),
-                });
+        // Convert Markdown to HTML and remove asterisks (*)
+        let cleanedText = converter.makeHtml(text.replace(/\*/g, ""));
 
-                const data = await response.json();
-                addMessage("AgriBuddy", data.response);
-            } catch (error) {
-                addMessage("AgriBuddy", "Error: Unable to fetch response.");
-            }
+        msgDiv.innerHTML = cleanedText;
+        msgDiv.classList.add("message", className);
+        
+        msgDiv.style.cssText = `
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+            max-width: 75%;
+            background: ${sender === "You" ? "#3d6a25" : "#e0e0e0"};
+            color: ${sender === "You" ? "white" : "#333"};
+            align-self: ${sender === "You" ? "flex-end" : "flex-start"};
+        `;
+
+        chatBody.appendChild(msgDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const userMessage = userInput.value.trim();
+        if (!userMessage) return;
+
+        displayMessage("You", userMessage, "user-message");
+        userInput.value = "";
+
+        try {
+            const response = await fetch("http://localhost:5000/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userMessage }),
+            });
+
+            const data = await response.json();
+            displayMessage("AgriBuddy", data.response, "bot-message");
+        } catch (error) {
+            displayMessage("AgriBuddy", "Error: Unable to fetch response.", "bot-message");
         }
+    }
 
-        sendButton.addEventListener("click", sendMessage);
+    sendButton.addEventListener("click", sendMessage);
 
-        function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
+    function handleKeyPress(event) {
+        if (event.key === "Enter") {
+            sendMessage();
         }
-    </script>
+    }
 
-    <script>
 
         function vote(icon, type) {
             const parentDiv = icon.parentElement;
@@ -447,6 +480,27 @@
             let count = parseInt(countElement.innerText, 10);
             countElement.innerText = count + 1;
         }
+
+        function openRequestDetails(name, location, company, requestId) {
+            document.getElementById('buyerName').innerText = name;
+            document.getElementById('buyerLocation').innerText = location;
+            document.getElementById('buyerCompany').innerText = company;
+            document.getElementById('request_id').value = requestId;
+            new bootstrap.Modal(document.getElementById('requestDetailsModal')).show();
+        }
+
+        function openRequestDetails(name, location, company, crop, quantity, offerPrice, totalAmount, requestId) {
+            document.getElementById('buyerName').innerText = name || 'working on it...';
+            document.getElementById('buyerLocation').innerText = location || 'working on it...';
+            document.getElementById('buyerCompany').innerText = company || 'working on it...';
+            document.getElementById('cropName').innerText = crop;
+            document.getElementById('quantity').innerText = quantity;
+            document.getElementById('offerPrice').innerText = offerPrice;
+            document.getElementById('totalAmount').innerText = totalAmount;
+            document.getElementById('request_id').value = requestId;
+            new bootstrap.Modal(document.getElementById('requestDetailsModal')).show();
+}
+
     </script>
    
 
@@ -517,7 +571,45 @@
             </div>
         </div>
     </div>
-
+   
+    <div class="modal fade" id="requestDetailsModal" tabindex="-1" aria-labelledby="requestDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Request Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="buyerDetails">
+                        <h6>Buyer Information</h6>
+                        <p><strong>Name:</strong> <span id="buyerName"></span></p>
+                        <p><strong>Location:</strong> <span id="buyerLocation"></span></p>
+                        <p><strong>Company:</strong> <span id="buyerCompany"></span></p>
+                    </div>
+    
+                    <div id="requestDetails">
+                        <h6>Request Information</h6>
+                        <p><strong>Crop Name:</strong> <span id="cropName"></span></p>
+                        <p><strong>Quantity:</strong> <span id="quantity"></span> kg</p>
+                        <p><strong>Price per kg:</strong> Rs. <span id="offerPrice"></span></p>
+                        <p><strong>Total Price:</strong> Rs. <span id="totalAmount"></span></p>
+                    </div>
+    
+                    <div id="timelineSection">
+                        <h6>Timeline</h6>
+                        <p>Coming soon...</p>
+                    </div>
+    
+                    <form method="POST" action="/accept-request">
+                        <input type="hidden" name="request_id" id="request_id">
+                        <button type="submit" class="btn btn-success w-100 mt-3">Confirm Acceptance</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
 
 
     
