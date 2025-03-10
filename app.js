@@ -263,6 +263,7 @@ app.get("/home", authenticateToken, async (req, res) => {
                 proposals: formatProposals(row.proposals),
                 posted_time: calculatePostedTime(row.created_at)
             }));
+        //console.log(result.rows);
 
         res.render('home', { 
             requests: result.rows,
@@ -342,29 +343,40 @@ app.post('/submit-buyer-profile', authenticateToken, async (req, res) => {
 });
 
 app.get('/home/request', async (req, res) => {
+    const { request_id } = req.query;
     try {
-        const results = await db.query(`
+        const result = await db.query(`
             SELECT 
-                r.*, 
-                u.name AS buyer_name, 
-                u.buyer_profile->>'location' AS buyer_location, 
-                u.buyer_profile->>'company' AS buyer_company
-            FROM 
-                requests r
-            JOIN 
-                users u 
-            ON 
-                r.user_id = u.user_id
-            WHERE 
-                r.accepted_by IS NULL
-        `);
-
-        res.json({ requests: results.rows });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error fetching data.' });
+                requests.*, 
+                users.name, 
+                users.buyer_profile 
+            FROM requests 
+            JOIN users 
+            ON users.user_id = requests.user_id 
+            WHERE requests.request_id = $1
+        `, [request_id]);
+        
+        if (result.rows.length > 0) {
+            const buyerProfile = result.rows[0].buyer_profile || {};
+            const requestData = {
+                ...result.rows[0],
+                buyer_name: result.rows[0].name,
+                buyer_location: buyerProfile.location,
+                buyer_company: buyerProfile.companyName
+            };
+            console.log(requestData);
+            res.json(requestData);
+        } else {
+            res.status(404).json({ error: 'Request not found' });
+        }
+        
+        
+    } catch (error) {
+        console.error('Error fetching request details:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
