@@ -126,7 +126,7 @@ app.post("/postdemand", async (req, res) => {
   });
 //  register user
 app.post("/reguser", async (req, res) => {
-    console.log("Received registration request"); // ✅ Debug log
+    console.log("Received registration request"); 
     console.log("Request Body:", req.body);
     const { fname, lname, username: email, password } = req.body;
 
@@ -219,20 +219,17 @@ app.get('/home/search', async (req, res) => {
              WHERE crop_name ILIKE $1 
              OR description ILIKE $1
              OR location ILIKE $1`, 
-            [`%${searchQuery}%`] 
+            [`%${searchQuery}%`]
         );
-
         result.rows.forEach(row => {
             row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
             row.proposals = formatProposals(row.proposals);
-        });
-
+        })
         res.render('home', { requests: result.rows });
     } catch (error) {
         console.error('Error fetching search results:', error);
         res.status(500).send('Internal Server Error');
     }
 });
-
 // Start the server
 app.listen(port, () => console.log(`Server running on port ${port}`));

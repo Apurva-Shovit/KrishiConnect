@@ -21,7 +21,8 @@
 </head>
 <body>
 
-    <!--navbar  -->
+    <!-- navbar -->
+     <!--navbar  -->
     <div class="px-3 py-1 border-bottom" style="background-color: #3d6a25;">
         <div class="container-fluid">
           <div class="d-flex flex-wrap align-items-center justify-content-between w-100">
@@ -64,6 +65,7 @@
               
               <li>
                 <a href="/postdemandpage" class="nav-link text-white d-flex flex-column align-items-center">
+                <a href="/postdemand" class="nav-link text-white d-flex flex-column align-items-center">
                   
                   <button type="" class="btn btn-outline-light" fdprocessedid="bx833o"><i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand</button>
   
@@ -79,8 +81,8 @@
                 <ul class="dropdown-menu text-small shadow" 
                     aria-labelledby="dropdownMenuButton">
                     <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li><a class="dropdown-item" href="#">Farmer Profile</a></li>
-                    <li><a class="dropdown-item" href="#">Buyer Profile</a></li>
+                    <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#farmerProfileModal">Farmer Profile</a></li>
+                    <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#buyerProfileModal">Buyer Profile</a></li>
                     <li><a class="dropdown-item" href="#">Payments</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="/home/logout">Sign out</a></li>
@@ -164,7 +166,6 @@
                                         <i class="bi bi-check-circle-fill" style="margin-right: 4px;"></i>
                                         <%= request.payment_verified ? 'Payment Verified' : 'Payment Pending' %>
                                         <span style="margin: 0 8px;">⭐ ⭐ ⭐ ⭐ <%= request.rating %></span>
-                                        <span>₹<%= request.total_spent %>+ spent</span>
                                         <i class="bi bi-geo-alt" style="margin-left: 12px; margin-right: 4px;"></i>
                                         <%= request.location %>
                                         <span style="margin-left: 12px;">Proposals: <%= request.proposals %></span>
@@ -182,67 +183,65 @@
 
 
                 <div class="col-md-3" style="width:25%;">
-                    <div class="card bg-light mb-4 p-4 box-shadow h-md-250">
-                        <div class="card-body d-flex align-items-center"> 
-                            <i class="bi bi-person-circle fs-1 me-3 text-primary    " 
-                                 style="width: 60px; height: 60px; font-size: 30px;"></i>
-                            <div>
-                                <h3 class="h5 mb-1">John Doe</h3>
-                                <p class="text-muted mb-2">Please complete and verify your profile</p>
-                                <div class="d-flex align-items-center">
-                                    <a href="#" class="text-primary">Complete your profile</a>
-                                    <div class="progress flex-grow-1 ms-3" style="height: 8px;">
-                                        <div class="progress-bar bg-success" role="progressbar" 
-                                             style="width: 70%;" 
-                                             aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
+                    <% if (profileStatus === 'incomplete') { %>
+                        <div class="card bg-light mb-4 p-4 box-shadow h-md-250">
+                            <div class="card-body d-flex align-items-center">
+                                <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
+                                <div>
+                                    <h3 class="h5 mb-1"><%= user.name %></h3>
+                                    <p class="text-muted mb-2">Please complete and verify your profile</p>
+                                    <div class="d-flex align-items-center">
+                                        <a href="/home/profile" class="text-primary">Complete your profile</a>
+
                                         </div>
                                     </div>
-                                    <span class="ms-2 text-muted">70%</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-
-                    <!-- show either one based on if it is verified -->
-                    <div class="profile-card bg-light p-4 rounded shadow-sm mb-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
-                            <div>
-                                <h3 class="mb-1">Apurva Shovit</h3>
-                                <span class="badge bg-success">Verified Farmer</span>
+                    <% } else if (profileStatus === 'farmer') { %>
+                        <div class="profile-card bg-light p-4 rounded shadow-sm mb-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
+                                <div>
+                                    <h3 class="mb-1"><%= user.name %></h3>
+                                    <span class="badge bg-success">Verified Farmer</span>
+                                </div>
+                            </div>
+                            <div class="profile-info">
+                                <p><strong>Location:</strong> <%= user.farmer_profile.location %></p>
+                                <p><strong>Farm Size:</strong> <%= user.farmer_profile.farmSize %> Acres</p>
+                                <p><strong>Crops Grown:</strong> <%= user.farmer_profile.cropsGrown.join(', ') %></p>
+                                <p><strong>Experience:</strong> <%= user.farmer_profile.experience %> years</p>
+                                <p><strong>Farming Methods:</strong> <%= user.farmer_profile.farmingMethods.join(', ') %></p>
+                                <p><strong>Past Deals:</strong> <%= user.farmer_profile.past_deals %> Successful Transactions</p>
+                                <p><strong>Ratings & Reviews:</strong> 
+                                    <%= '★'.repeat(Math.floor(user.farmer_profile.rating)) %>
+                                    <%= '☆'.repeat(5 - Math.floor(user.farmer_profile.rating)) %>
+                                    (<%= user.farmer_profile.rating.toFixed(1) %>/5)
+                                </p>                            </div>
+                        </div>
+                        
+                    <% } else if (profileStatus === 'buyer') { %>
+                        <div class="profile-card bg-light p-4 rounded shadow-sm">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
+                                <div>
+                                    <h3 class="mb-1"><%= user.name %></h3>
+                                    <span class="badge bg-info">Verified Buyer</span>
+                                </div>
+                            </div>
+                            <div class="profile-info">
+                                <p><strong>Location:</strong> Bihar, India</p>
+                                <p><strong>Company Name:</strong> Shovit Agro Pvt Ltd</p>
+                                <p><strong>Products Needed:</strong> Wheat, Rice, Pulses</p>
+                                <p><strong>Preferred Quantities:</strong> Bulk Orders</p>
+                                <p><strong>Payment Reliability:</strong> 100% Completion Rate</p>
+                                <p><strong>Past Deals:</strong> 20 Successful Transactions</p>
+                                <p><strong>Ratings & Reviews:</strong> ⭐⭐⭐⭐☆ (4.5/5)</p>
                             </div>
                         </div>
-                        <div class="profile-info">
-                            <p><strong>Location:</strong> Bihar, India</p>
-                            <p><strong>Farm Size:</strong> 10 Acres</p>
-                            <p><strong>Crops Grown:</strong> Wheat, Rice, Maize</p>
-                            <p><strong>Experience:</strong> 8 years</p>
-                            <p><strong>Farming Methods:</strong> Organic</p>
-                            <p><strong>Certifications:</strong> Organic Farming Certified</p>
-                            <p><strong>Past Deals:</strong> 15 Successful Transactions</p>
-                            <p><strong>Ratings & Reviews:</strong> ⭐⭐⭐⭐⭐ (4.9/5)</p>
-                        </div>
-                    </div>
+                    <% } %>
                     
-                    <div class="profile-card bg-light p-4 rounded shadow-sm">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
-                            <div>
-                                <h3 class="mb-1">Apurva Shovit</h3>
-                                <span class="badge bg-info">Verified Buyer</span>
-                            </div>
-                        </div>
-                        <div class="profile-info">
-                            <p><strong>Location:</strong> Bihar, India</p>
-                            <p><strong>Company Name:</strong> Shovit Agro Pvt Ltd</p>
-                            <p><strong>Products Needed:</strong> Wheat, Rice, Pulses</p>
-                            <p><strong>Preferred Quantities:</strong> Bulk Orders</p>
-                            <p><strong>Payment Reliability:</strong> 100% Completion Rate</p>
-                            <p><strong>Past Deals:</strong> 20 Successful Transactions</p>
-                            <p><strong>Ratings & Reviews:</strong> ⭐⭐⭐⭐☆ (4.5/5)</p>
-                        </div>
-                    </div>
                     
                 </div>
             </div>
@@ -259,6 +258,77 @@
         }
     </script>
    
+
+    <div class="modal fade" id="farmerProfileModal" tabindex="-1" aria-labelledby="farmerProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="farmerProfileModalLabel">Farmer Profile Form</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="farmerProfileForm" method="POST" action="/submit-farmer-profile">
+                        <div class="mb-3">
+                            <label for="farmer_location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="farmer_location" name="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="farmSize" class="form-label">Farm Size (in acres)</label>
+                            <input type="number" class="form-control" id="farmSize" name="farmSize" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cropsGrown" class="form-label">Crops Grown</label>
+                            <input type="text" class="form-control" id="cropsGrown" name="cropsGrown" placeholder="Wheat,Rice,Bajra" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="experience" class="form-label">Experience (in years)</label>
+                            <input type="number" class="form-control" id="experience" name="experience" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="farmingMethods" class="form-label">Farming Methods</label>
+                            <input type="text" class="form-control" id="farmingMethods" name="farmingMethods" placeholder="organic, fertilizer based" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="buyerProfileModal" tabindex="-1" aria-labelledby="buyerProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="buyerProfileModalLabel">Buyer Profile Form</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="buyerProfileForm" method="POST" action="/submit-buyer-profile">
+                        <div class="mb-3">
+                            <label for="buyer_location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="buyer_location" name="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="companyName" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="companyName" name="companyName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productsNeeded" class="form-label">Products Needed</label>
+                            <input type="text" class="form-control" id="productsNeeded" name="productsNeeded" placeholder="Wheat, Rice, Bajra" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="preferredQuantities" class="form-label">Preferred Quantities</label>
+                            <input type="text" class="form-control" id="preferredQuantities" name="preferredQuantities" placeholder="e.g., Bulk Orders, Small Batches" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     
     
 </body>
