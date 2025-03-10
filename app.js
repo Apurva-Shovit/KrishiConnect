@@ -20,8 +20,8 @@ app.use(cookieParser());
 const db = new pg.Client({
     user: "postgres",
     host: "localhost",
-    database: "KrishiConnect1",
-    password: "rootuser",
+    database: "KrishiConnect",
+    password: "password",
     port: 5432,
 });
 
