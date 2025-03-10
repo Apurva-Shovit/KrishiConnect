@@ -111,7 +111,6 @@ app.get("/about", (req, res) => {
     res.render("about.ejs", {errorMessage : null});
 });
 
-// Secure Route for Posting Demand
 app.get("/postdemandpage", authenticateToken, (req, res) => {
     try {
         res.render("postdemand.ejs", { user: req.user }); // Pass user data to EJS
@@ -159,14 +158,12 @@ app.post("/postdemand", authenticateToken, async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-//  register user
 app.post("/reguser", async (req, res) => {
     console.log("Received registration request"); 
     console.log("Request Body:", req.body);
     const { fname, lname, username: email, password } = req.body;
 
     try {
-        // Check if email exists
         const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [email]);
 
         if (checkResult.rows.length > 0) {
@@ -174,7 +171,6 @@ app.post("/reguser", async (req, res) => {
             return res.render('register.ejs', { errorMessage : 'user already exists'});
         }
 
-        // Hash password and store user
         bcrypt.hash(password, saltRounds, async (err, hash) => {
             if (err) {
                 console.error("Error hashing password:", err);
@@ -188,7 +184,7 @@ app.post("/reguser", async (req, res) => {
                 [fname+" "+lname, email, hash]
             );
 
-            res.redirect("login"); // Redirect after success
+            res.redirect("login"); 
         });
 
     } catch (err) {
@@ -197,7 +193,6 @@ app.post("/reguser", async (req, res) => {
     }
 });
 
-//login user
 app.post("/login", async (req, res) => {
     const email = req.body.username;
     const loginPassword = req.body.password;
@@ -217,14 +212,12 @@ app.post("/login", async (req, res) => {
             return res.render('login', {errorMessage : 'incorrect login or password'});
         }
 
-        // Create JWT token
         const accessToken = jwt.sign(
             { email: user.email, id: user.id },
             JWT_SECRET,
             { expiresIn: "1h" }
         );
 
-        // Send token in a cookie
         res.cookie("token", accessToken, {
             httpOnly: true,   // Prevent client-side JS access
             secure: false,    // Set `true` if using HTTPS
@@ -373,5 +366,4 @@ app.get('/home/request', async (req, res) => {
 });
 
 
-// Start the server
 app.listen(port, () => console.log(`Server running on port ${port}`));
