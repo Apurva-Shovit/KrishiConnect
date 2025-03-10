@@ -77,7 +77,7 @@
                     <li><a class="dropdown-item" href="#">Buyer Profile</a></li>
                     <li><a class="dropdown-item" href="#">Payments</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    <li><a class="dropdown-item" href="/home/logout">Sign out</a></li>
                 </ul>
             </div>
             
@@ -102,19 +102,22 @@
                     </div>
                     <!-- input search -->
                     <div class="row" style="width:100%">
-                        <form id="searchForm" method="GET" action="/search">
+                        <form id="searchForm" method="GET" action="/home/search">
                             <input 
+                                name="query" 
                                 aria-labelledby="cfe-job-search-label" 
                                 type="search" 
                                 autocomplete="off" 
                                 autocorrect="off" 
                                 autocapitalize="off" 
                                 spellcheck="false" 
-                                placeholder="Search for jobs" 
+                                placeholder="Search for crop-name, description or location" 
                                 value="" 
                                 class="air3-typeahead-input-fake air3-input form-control"
                                 style="width: 100%;">
+                            <button type="submit" class="btn btn-primary mt-2" style="width: min-content">Search</button>
                         </form>
+                        
                     </div>
 
                     <!-- request container -->
@@ -247,10 +250,7 @@
             const countElement = parentDiv.querySelector(type === 'up' ? '.upvote-count' : '.downvote-count');
             let count = parseInt(countElement.innerText, 10);
             countElement.innerText = count + 1;
-        }
-
-        document.getElementById('searchForm').addEventListener('submit', async function (e) {
-        
+        }        
 
     </script>
    
