@@ -69,13 +69,14 @@ const authenticateToken = (req, res, next) => {
             }
 
             const dbUser = result.rows[0];
+
+            let profileStatusStr ="";
+            if(dbUser.farmer_profile_completed) profileStatusStr+='farmer';
+            if(dbUser.buyer_profile_completed) profileStatusStr+='buyer';
+            else profileStatusStr='incomplete';
             req.user = {
                 ...dbUser,
-                profileStatus: dbUser.farmer_profile_completed
-                    ? 'farmer'
-                    : dbUser.buyer_profile_completed
-                    ? 'buyer'
-                    : 'incomplete'
+                profileStatus:profileStatusStr
             };
 
             next();

@@ -192,55 +192,62 @@
                                     <p class="text-muted mb-2">Please complete and verify your profile</p>
                                     <div class="d-flex align-items-center">
                                         <a href="/home/profile" class="text-primary">Complete your profile</a>
-
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    <% } else if (profileStatus === 'farmer') { %>
-                        <div class="profile-card bg-light p-4 rounded shadow-sm mb-4">
-                            <div class="d-flex align-items-center mb-3">
-                                <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
-                                <div>
-                                    <h3 class="mb-1"><%= user.name %></h3>
-                                    <span class="badge bg-success">Verified Farmer</span>
+                    <% } else { %>
+                        <% if (profileStatus.includes('farmer')) { %>
+                            <div class="profile-card bg-light p-4 rounded shadow-sm mb-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
+                                    <div>
+                                        <h3 class="mb-1"><%= user.name %></h3>
+                                        <span class="badge bg-success">Verified Farmer</span>
+                                    </div>
+                                </div>
+                                <div class="profile-info">
+                                    <p><strong>Location:</strong> <%= user.farmer_profile.location %></p>
+                                    <p><strong>Farm Size:</strong> <%= user.farmer_profile.farmSize %> Acres</p>
+                                    <p><strong>Crops Grown:</strong> <%= user.farmer_profile.cropsGrown.join(', ') %></p>
+                                    <p><strong>Experience:</strong> <%= user.farmer_profile.experience %> years</p>
+                                    <p><strong>Farming Methods:</strong> <%= user.farmer_profile.farmingMethods.join(', ') %></p>
+                                    <p><strong>Past Deals:</strong> <%= user.farmer_profile.past_deals %> Successful Transactions</p>
+                                    <p><strong>Ratings & Reviews:</strong> 
+                                        <%= '★'.repeat(Math.floor(user.farmer_profile.rating)) %>
+                                        <%= '☆'.repeat(5 - Math.floor(user.farmer_profile.rating)) %>
+                                        (<%= user.farmer_profile.rating.toFixed(1) %>/5)
+                                    </p>
                                 </div>
                             </div>
-                            <div class="profile-info">
-                                <p><strong>Location:</strong> <%= user.farmer_profile.location %></p>
-                                <p><strong>Farm Size:</strong> <%= user.farmer_profile.farmSize %> Acres</p>
-                                <p><strong>Crops Grown:</strong> <%= user.farmer_profile.cropsGrown.join(', ') %></p>
-                                <p><strong>Experience:</strong> <%= user.farmer_profile.experience %> years</p>
-                                <p><strong>Farming Methods:</strong> <%= user.farmer_profile.farmingMethods.join(', ') %></p>
-                                <p><strong>Past Deals:</strong> <%= user.farmer_profile.past_deals %> Successful Transactions</p>
-                                <p><strong>Ratings & Reviews:</strong> 
-                                    <%= '★'.repeat(Math.floor(user.farmer_profile.rating)) %>
-                                    <%= '☆'.repeat(5 - Math.floor(user.farmer_profile.rating)) %>
-                                    (<%= user.farmer_profile.rating.toFixed(1) %>/5)
-                                </p>                            </div>
-                        </div>
-                        
-                    <% } else if (profileStatus === 'buyer') { %>
-                        <div class="profile-card bg-light p-4 rounded shadow-sm">
-                            <div class="d-flex align-items-center mb-3">
-                                <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
-                                <div>
-                                    <h3 class="mb-1"><%= user.name %></h3>
-                                    <span class="badge bg-info">Verified Buyer</span>
+                        <% } %>
+                    
+                        <% if (profileStatus.includes('buyer')) { %>
+                            <div class="profile-card bg-light p-4 rounded shadow-sm">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
+                                    <div>
+                                        <h3 class="mb-1"><%= user.name %></h3>
+                                        <span class="badge bg-info">Verified Buyer</span>
+                                    </div>
+                                </div>
+                                <div class="profile-info">
+                                    <p><strong>Location:</strong> <%= user.buyer_profile.location %></p>
+                                    <p><strong>Company Name:</strong> <%= user.buyer_profile.companyName %></p>
+                                    <p><strong>Products Needed:</strong> <%= user.buyer_profile.productsNeeded.join(', ') %></p>
+                                    <p><strong>Preferred Quantities:</strong> <%= user.buyer_profile.preferredQuantities %></p>
+                                    <p><strong>Payment Reliability:</strong> <%= (user.buyer_profile.paymentReliability * 100).toFixed(1) %>% Completion Rate</p>
+                                    <p><strong>Past Deals:</strong> <%= user.buyer_profile.past_deals %> Successful Transactions</p>
+                                    <p><strong>Ratings & Reviews:</strong> 
+                                        <%= '★'.repeat(Math.floor(user.buyer_profile.rating)) %>
+                                        <%= '☆'.repeat(5 - Math.floor(user.buyer_profile.rating)) %>
+                                        (<%= user.buyer_profile.rating.toFixed(1) %>/5)
+                                    </p>
                                 </div>
                             </div>
-                            <div class="profile-info">
-                                <p><strong>Location:</strong> Bihar, India</p>
-                                <p><strong>Company Name:</strong> Shovit Agro Pvt Ltd</p>
-                                <p><strong>Products Needed:</strong> Wheat, Rice, Pulses</p>
-                                <p><strong>Preferred Quantities:</strong> Bulk Orders</p>
-                                <p><strong>Payment Reliability:</strong> 100% Completion Rate</p>
-                                <p><strong>Past Deals:</strong> 20 Successful Transactions</p>
-                                <p><strong>Ratings & Reviews:</strong> ⭐⭐⭐⭐☆ (4.5/5)</p>
-                            </div>
-                        </div>
+                        <% } %>
                     <% } %>
+                    
                     
                     
                 </div>
