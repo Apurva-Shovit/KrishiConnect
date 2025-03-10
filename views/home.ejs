@@ -236,7 +236,7 @@
                                     <p><strong>Company Name:</strong> <%= user.buyer_profile.companyName %></p>
                                     <p><strong>Products Needed:</strong> <%= user.buyer_profile.productsNeeded.join(', ') %></p>
                                     <p><strong>Preferred Quantities:</strong> <%= user.buyer_profile.preferredQuantities %></p>
-                                    <p><strong>Payment Reliability:</strong> <%= (user.buyer_profile.paymentReliability * 100).toFixed(1) %>% Completion Rate</p>
+                                    <p><strong>Payment Reliability:</strong> <%= (user.buyer_profile.paymentReliability).toFixed(1) %>% Completion Rate</p>
                                     <p><strong>Past Deals:</strong> <%= user.buyer_profile.past_deals %> Successful Transactions</p>
                                     <p><strong>Ratings & Reviews:</strong> 
                                         <%= '★'.repeat(Math.floor(user.buyer_profile.rating)) %>
