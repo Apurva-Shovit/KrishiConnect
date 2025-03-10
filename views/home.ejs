@@ -175,11 +175,24 @@
                                             <%= request.location %>
                                             <span style="margin-left: 12px;">Proposals: <%= request.proposals %></span>
                                         </div>
-                                        <form method="POST" action="/accept-request">
-                                            <input type="hidden" name="request_id" value="<%= request.id %>">
-                                            <button type="submit" class="btn btn-success">Accept Request</button>
-                                        </form>
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-success" 
+                                            onclick="openRequestDetails(
+                                                '<%= request.buyer_name %>', 
+                                                '<%= request.buyer_location %>', 
+                                                '<%= request.buyer_company %>', 
+                                                '<%= request.crop_name %>',
+                                                '<%= request.quantity %>',
+                                                '<%= request.offer_price %>',
+                                                '<%= request.total_amount %>',
+                                                '<%= request.id %>'
+                                            )">
+                                            Accept Request
+                                        </button>
                                     </div>
+                                    
+                                    
                                     
                                 </div>
                             </div>
@@ -437,9 +450,6 @@
                 sendMessage();
             }
         }
-    </script>
-
-    <script>
 
         function vote(icon, type) {
             const parentDiv = icon.parentElement;
@@ -447,6 +457,27 @@
             let count = parseInt(countElement.innerText, 10);
             countElement.innerText = count + 1;
         }
+
+        function openRequestDetails(name, location, company, requestId) {
+            document.getElementById('buyerName').innerText = name;
+            document.getElementById('buyerLocation').innerText = location;
+            document.getElementById('buyerCompany').innerText = company;
+            document.getElementById('request_id').value = requestId;
+            new bootstrap.Modal(document.getElementById('requestDetailsModal')).show();
+        }
+
+        function openRequestDetails(name, location, company, crop, quantity, offerPrice, totalAmount, requestId) {
+            document.getElementById('buyerName').innerText = name || 'working on it...';
+            document.getElementById('buyerLocation').innerText = location || 'working on it...';
+            document.getElementById('buyerCompany').innerText = company || 'working on it...';
+            document.getElementById('cropName').innerText = crop;
+            document.getElementById('quantity').innerText = quantity;
+            document.getElementById('offerPrice').innerText = offerPrice;
+            document.getElementById('totalAmount').innerText = totalAmount;
+            document.getElementById('request_id').value = requestId;
+            new bootstrap.Modal(document.getElementById('requestDetailsModal')).show();
+}
+
     </script>
    
 
@@ -517,7 +548,45 @@
             </div>
         </div>
     </div>
-
+   
+    <div class="modal fade" id="requestDetailsModal" tabindex="-1" aria-labelledby="requestDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Request Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="buyerDetails">
+                        <h6>Buyer Information</h6>
+                        <p><strong>Name:</strong> <span id="buyerName"></span></p>
+                        <p><strong>Location:</strong> <span id="buyerLocation"></span></p>
+                        <p><strong>Company:</strong> <span id="buyerCompany"></span></p>
+                    </div>
+    
+                    <div id="requestDetails">
+                        <h6>Request Information</h6>
+                        <p><strong>Crop Name:</strong> <span id="cropName"></span></p>
+                        <p><strong>Quantity:</strong> <span id="quantity"></span> kg</p>
+                        <p><strong>Price per kg:</strong> Rs. <span id="offerPrice"></span></p>
+                        <p><strong>Total Price:</strong> Rs. <span id="totalAmount"></span></p>
+                    </div>
+    
+                    <div id="timelineSection">
+                        <h6>Timeline</h6>
+                        <p>Coming soon...</p>
+                    </div>
+    
+                    <form method="POST" action="/accept-request">
+                        <input type="hidden" name="request_id" id="request_id">
+                        <button type="submit" class="btn btn-success w-100 mt-3">Confirm Acceptance</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
 
 
     

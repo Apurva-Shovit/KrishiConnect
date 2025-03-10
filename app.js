@@ -20,8 +20,8 @@ app.use(cookieParser());
 const db = new pg.Client({
     user: "postgres",
     host: "localhost",
-    database: "KrishiConnect",
-    password: "password",
+    database: "KrishiConnect1",
+    password: "rootuser",
     port: 5432,
 });
 
@@ -345,6 +345,32 @@ app.post('/submit-buyer-profile', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Failed to submit buyer profile' });
     }
 });
+
+app.get('/home/request', async (req, res) => {
+    try {
+        const results = await db.query(`
+            SELECT 
+                r.*, 
+                u.name AS buyer_name, 
+                u.buyer_profile->>'location' AS buyer_location, 
+                u.buyer_profile->>'company' AS buyer_company
+            FROM 
+                requests r
+            JOIN 
+                users u 
+            ON 
+                r.user_id = u.user_id
+            WHERE 
+                r.accepted_by IS NULL
+        `);
+
+        res.json({ requests: results.rows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error fetching data.' });
+    }
+});
+
 
 // Start the server
 app.listen(port, () => console.log(`Server running on port ${port}`));
