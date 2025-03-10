@@ -233,40 +233,43 @@ app.post("/login", async (req, res) => {
     }
 });
   
-app.get("/home", authenticateToken, async (req, res) => { 
+app.get("/home", authenticateToken, async (req, res) => {
     try {
-        const searchQuery = req.query.searchQuery || '';
-
-        const queryText = searchQuery 
-            ? `SELECT * FROM requests 
-               WHERE (crop_name ILIKE $1 
-               OR description ILIKE $1
-               OR location ILIKE $1)
-               ORDER BY created_at DESC;`
-            : `SELECT * FROM requests ORDER BY created_at DESC;`;
-
-        const queryParams = searchQuery ? [`%${searchQuery}%`] : [];
+        console.log(req.user);
+        const filterMyDemands = req.query.filter === 'myDemands';
 
         const [result, userResult] = await Promise.all([
-            db.query(queryText, queryParams),
+            db.query('SELECT * FROM requests ORDER BY created_at DESC;'),
             db.query('SELECT * FROM users WHERE email = $1', [req.user.email])
         ]);
 
         const userData = userResult.rows[0];
 
-        result.rows = result.rows
-            .filter(request => request.accepted_by === null)
-            .filter(request => request.user_id != userData.user_id)
-            .map(row => ({
-                ...row,
-                delivery_deadline: row.delivery_deadline.toISOString().split('T')[0],
-                proposals: formatProposals(row.proposals),
-                posted_time: calculatePostedTime(row.created_at)
+        let filteredRequests = result.rows.map(row => ({
+            ...row,
+            delivery_deadline: row.delivery_deadline.toISOString().split('T')[0],
+            proposals: formatProposals(row.proposals),
+            posted_time: calculatePostedTime(row.created_at)
+        }));
+
+
+        if (filterMyDemands) {
+            filteredRequests = filteredRequests.filter(request =>
+                request.user_id === userData.user_id || request.accepted_by === userData.email
+            ).map(request => ({
+                ...request,
+                accepted_status: request.accepted_by 
+                    ? `Accepted by - ${request.accepted_by}` 
+                    : 'Yet to be accepted'
             }));
-        //console.log(result.rows);
+        } else {
+            filteredRequests = filteredRequests
+                .filter(request => request.accepted_by === null)
+                .filter(request => request.user_id != userData.user_id);
+        }
 
         res.render('home', { 
-            requests: result.rows,
+            requests: filteredRequests,
             profileStatus: req.user.profileStatus,
             user: userData
         });
@@ -288,7 +291,6 @@ app.get('/home/search', authenticateToken, (req, res) => {
 });
 
 app.post('/submit-farmer-profile',authenticateToken, (req, res) => {
-    console.log(req.user);
     const { location, farmSize, cropsGrown, experience, farmingMethods } = req.body;
     const farmerProfile = {
         location,
@@ -314,7 +316,6 @@ app.post('/submit-farmer-profile',authenticateToken, (req, res) => {
 })
 
 app.post('/submit-buyer-profile', authenticateToken, async (req, res) => {
-    console.log('this is req.body',req.body);
     
     const { location, companyName, productsNeeded, preferredQuantities } = req.body;
 
@@ -328,7 +329,6 @@ app.post('/submit-buyer-profile', authenticateToken, async (req, res) => {
         rating: 0,
     };
 
-    console.log(buyerProfile);
     try {
         await db.query(
 
@@ -364,7 +364,6 @@ app.get('/home/request', async (req, res) => {
                 buyer_location: buyerProfile.location,
                 buyer_company: buyerProfile.companyName
             };
-            console.log(requestData);
             res.json(requestData);
         } else {
             res.status(404).json({ error: 'Request not found' });
@@ -376,6 +375,74 @@ app.get('/home/request', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+app.get('/get-farmer-profile', async (req, res) => {
+    const { user_id } = req.query;
+
+    try {
+        const result = await db.query(`
+            SELECT farmer_profile, farmer_profile_completed 
+            FROM users 
+            WHERE user_id = $1
+        `, [user_id]);
+
+        if (result.rows.length > 0) {
+            const { farmer_profile, farmer_profile_completed } = result.rows[0];
+            res.json({ farmer_profile, farmer_profile_completed });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching farmer profile:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/get-buyer-profile', authenticateToken, async (req, res) => {
+    try {
+        const userData = await db.query('SELECT * FROM users WHERE user_id = $1', [req.query.user_id]);
+        if (!userData.rows.length) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const user = userData.rows[0];
+        const buyerProfile = user.buyer_profile || {};
+
+        res.json({
+            buyer_profile_completed: user.buyer_profile_completed,
+            buyer_profile: {
+                location: buyerProfile.location || '',
+                companyName: buyerProfile.companyName || '',
+                productsNeeded: buyerProfile.productsNeeded || '',
+                preferredQuantities: buyerProfile.preferredQuantities || ''
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching buyer profile:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.post('/home/AcceptRequest', authenticateToken, async (req, res) => {
+    const { request_id } = req.body;
+
+    try {
+        const userEmail = req.user.email;
+
+        await db.query(
+            `UPDATE requests 
+             SET accepted_by = $1 
+             WHERE request_id = $2`,
+            [userEmail, request_id]
+        );
+
+        res.redirect('/home');
+    } catch (err) {
+        console.error('Error accepting request:', err);
+        res.status(500).send('Error accepting request.');
+    }
+});
+
 
 
 

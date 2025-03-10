@@ -67,19 +67,28 @@
             <ul class="nav col-12 col-lg-auto my-2 ms-auto my-md-0 text-small d-flex justify-content-end">
               <div class="d-flex align-items-center">
               
-              <li>
-                  <!-- <a href="/postdemand" class="nav-link text-white d-flex flex-column align-items-center"> -->
-                    <a href="/postdemandpage" class="nav-link text-white d-flex flex-column align-items-center">
-                  
-                  <button type="" class="btn btn-outline-light" fdprocessedid="bx833o"><i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand</button>
-  
-                </a>
-              </li>
+                <li>
+                    <% if (user.buyer_profile_completed) { %>
+                        <a href="/postdemandpage" class="nav-link text-white d-flex flex-column align-items-center">
+                            <button type="" class="btn btn-outline-light" fdprocessedid="bx833o">
+                                <i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand
+                            </button>
+                        </a>
+                    <% } else { %>
+                        <div class="nav-link text-white d-flex flex-column align-items-center">
+                            <button type="button" class="btn btn-outline-light" disabled>
+                                <i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand
+                            </button>
+                            <span class="text-danger mt-2">Complete your buyer profile to post demands.</span>
+                        </div>
+                    <% } %>
+                </li>
+                
               <li>
                 
   
             <div class="dropdown">
-                <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <a href="#" id="profileDropdown" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-person-circle text-white" style="font-size: 32px; "></i>
                 </a>
                 <ul class="dropdown-menu text-small shadow" 
@@ -248,8 +257,8 @@
                                     <h3 class="h5 mb-1"><%= user.name %></h3>
                                     <p class="text-muted mb-2">Please complete and verify your profile</p>
                                     <div class="d-flex align-items-center">
-                                        <a href="/home" class="text-primary">Complete your profile</a>
-                                    </div>
+                                        <a href="#" class="text-primary">Complete your profile</a>
+                                    </div>                                                                 
                                 </div>
                             </div>
                         </div>
@@ -422,113 +431,115 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
 
     <script>
-    window.onload = function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const filter = urlParams.get('filter');
 
-        document.getElementById('homeIcon').classList.remove('text-warning');
-        document.getElementById('myDemandsIcon').classList.remove('text-warning');
 
-        if (filter === 'myDemands') {
-            document.getElementById('myDemandsIcon').classList.add('text-warning');
-        } else {
-            document.getElementById('homeIcon').classList.add('text-warning');
+        window.onload = function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter');
+
+            document.getElementById('homeIcon').classList.remove('text-warning');
+            document.getElementById('myDemandsIcon').classList.remove('text-warning');
+
+            if (filter === 'myDemands') {
+                document.getElementById('myDemandsIcon').classList.add('text-warning');
+            } else {
+                document.getElementById('homeIcon').classList.add('text-warning');
+            }
+        };
+
+        function highlightLink(element) {
+            document.getElementById('homeIcon').classList.remove('text-warning');
+            document.getElementById('myDemandsIcon').classList.remove('text-warning');
+
+            const icon = element.querySelector('i');
+            icon.classList.add('text-warning');
         }
-    };
 
-    function highlightLink(element) {
-        document.getElementById('homeIcon').classList.remove('text-warning');
-        document.getElementById('myDemandsIcon').classList.remove('text-warning');
+        const chatButton = document.getElementById("chatbot-icon");
+        const chatWindow = document.getElementById("chat-window");
+        const closeChat = document.getElementById("close-chat");
+        const chatBody = document.getElementById("chat-body");
+        const userInput = document.getElementById("user-input");
+        const sendButton = document.getElementById("send-btn");
 
-        const icon = element.querySelector('i');
-        icon.classList.add('text-warning');
-    }
+        // Initialize Markdown converter
+        const converter = new showdown.Converter();
 
-    const chatButton = document.getElementById("chatbot-icon");
-    const chatWindow = document.getElementById("chat-window");
-    const closeChat = document.getElementById("close-chat");
-    const chatBody = document.getElementById("chat-body");
-    const userInput = document.getElementById("user-input");
-    const sendButton = document.getElementById("send-btn");
+        function toggleChat() {
+            if (chatWindow.style.display === "none" || chatWindow.style.opacity === "0") {
+                chatWindow.style.display = "flex";
+                setTimeout(() => {
+                    chatWindow.style.opacity = "1";
+                    chatWindow.style.transform = "translateY(0)";
+                }, 10);
+            } else {
+                chatWindow.style.opacity = "0";
+                chatWindow.style.transform = "translateY(20px)";
+                setTimeout(() => {
+                    chatWindow.style.display = "none";
+                }, 300);
+            }
+        }
 
-    // Initialize Markdown converter
-    const converter = new showdown.Converter();
-
-    function toggleChat() {
-        if (chatWindow.style.display === "none" || chatWindow.style.opacity === "0") {
-            chatWindow.style.display = "flex";
-            setTimeout(() => {
-                chatWindow.style.opacity = "1";
-                chatWindow.style.transform = "translateY(0)";
-            }, 10);
-        } else {
+        closeChat.addEventListener("click", () => {
             chatWindow.style.opacity = "0";
             chatWindow.style.transform = "translateY(20px)";
             setTimeout(() => {
                 chatWindow.style.display = "none";
             }, 300);
+        });
+
+        function displayMessage(sender, text, className) {
+            let msgDiv = document.createElement("div");
+
+            // Convert Markdown to HTML and remove asterisks (*)
+            let cleanedText = converter.makeHtml(text.replace(/\*/g, ""));
+
+            msgDiv.innerHTML = cleanedText;
+            msgDiv.classList.add("message", className);
+            
+            msgDiv.style.cssText = `
+                padding: 8px 12px;
+                margin: 5px 0;
+                border-radius: 8px;
+                max-width: 75%;
+                background: ${sender === "You" ? "#3d6a25" : "#e0e0e0"};
+                color: ${sender === "You" ? "white" : "#333"};
+                align-self: ${sender === "You" ? "flex-end" : "flex-start"};
+            `;
+
+            chatBody.appendChild(msgDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
         }
-    }
 
-    closeChat.addEventListener("click", () => {
-        chatWindow.style.opacity = "0";
-        chatWindow.style.transform = "translateY(20px)";
-        setTimeout(() => {
-            chatWindow.style.display = "none";
-        }, 300);
-    });
+        async function sendMessage() {
+            const userMessage = userInput.value.trim();
+            if (!userMessage) return;
 
-    function displayMessage(sender, text, className) {
-        let msgDiv = document.createElement("div");
+            displayMessage("You", userMessage, "user-message");
+            userInput.value = "";
 
-        // Convert Markdown to HTML and remove asterisks (*)
-        let cleanedText = converter.makeHtml(text.replace(/\*/g, ""));
+            try {
+                const response = await fetch("http://localhost:5000/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: userMessage }),
+                });
 
-        msgDiv.innerHTML = cleanedText;
-        msgDiv.classList.add("message", className);
-        
-        msgDiv.style.cssText = `
-            padding: 8px 12px;
-            margin: 5px 0;
-            border-radius: 8px;
-            max-width: 75%;
-            background: ${sender === "You" ? "#3d6a25" : "#e0e0e0"};
-            color: ${sender === "You" ? "white" : "#333"};
-            align-self: ${sender === "You" ? "flex-end" : "flex-start"};
-        `;
-
-        chatBody.appendChild(msgDiv);
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    async function sendMessage() {
-        const userMessage = userInput.value.trim();
-        if (!userMessage) return;
-
-        displayMessage("You", userMessage, "user-message");
-        userInput.value = "";
-
-        try {
-            const response = await fetch("http://localhost:5000/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: userMessage }),
-            });
-
-            const data = await response.json();
-            displayMessage("AgriBuddy", data.response, "bot-message");
-            } catch (error) {
-                displayMessage("AgriBuddy", "Error: Unable to fetch response.", "bot-message");
+                const data = await response.json();
+                displayMessage("AgriBuddy", data.response, "bot-message");
+                } catch (error) {
+                    displayMessage("AgriBuddy", "Error: Unable to fetch response.", "bot-message");
+                }
             }
-        }
 
-        sendButton.addEventListener("click", sendMessage);
+            sendButton.addEventListener("click", sendMessage);
 
-        function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                sendMessage();
+            function handleKeyPress(event) {
+                if (event.key === "Enter") {
+                    sendMessage();
+                }
             }
-        }
     </script>
 
 
