@@ -38,13 +38,13 @@
   
           <ul class="nav col-12 col-lg-auto my-2 mx-auto my-md-0 text-small d-flex justify-content-center">
             <li>
-                <a href="/" class="nav-link text-white d-flex flex-column align-items-center">
+                <a href="/home" class="nav-link text-white d-flex flex-column align-items-center">
                   <i class="bi bi-house" style="font-size: 18px;"></i>
                   Home
                 </a>
               </li>
               <li>
-                <a href="myDemands" class="nav-link text-white d-flex flex-column align-items-center">
+                <a href="/home" class="nav-link text-white d-flex flex-column align-items-center">
                   <i class="bi bi-card-text" style="font-size: 18px;"></i>
                   MyDemands
                 </a>
@@ -218,7 +218,7 @@
                                     <h3 class="h5 mb-1"><%= user.name %></h3>
                                     <p class="text-muted mb-2">Please complete and verify your profile</p>
                                     <div class="d-flex align-items-center">
-                                        <a href="/home/profile" class="text-primary">Complete your profile</a>
+                                        <a href="/home" class="text-primary">Complete your profile</a>
                                     </div>
                                 </div>
                             </div>
@@ -603,7 +603,7 @@
                         <p>Coming soon...</p>
                     </div>
     
-                    <form method="POST" action="/accept-request">
+                    <form method="GET" action="/home">
                         <input type="hidden" name="request_id" id="request_id">
                         <button type="submit" class="btn btn-success w-100 mt-3">Confirm Acceptance</button>
                     </form>
