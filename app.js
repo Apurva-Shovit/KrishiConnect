@@ -61,10 +61,10 @@ app.get("/", (req, res) => {
     res.render("landing.ejs");
 });
 app.get("/login", (req, res) => {
-    res.render("login.ejs");
+    res.render("login.ejs", {errorMessage : null});
 });
 app.get("/register", (req, res) => {
-    res.render("register.ejs");
+    res.render("register.ejs", {errorMessage : null});
 });
 app.get("/home", authenticateToken, async (req, res) => {
     try {
@@ -132,7 +132,7 @@ app.post("/login", async (req, res) => {
         const result = await db.query("SELECT * FROM users WHERE email = $1", [email]);
 
         if (result.rows.length === 0) {
-            return res.status(400).json({ error: "User not found" });
+            return res.render('login', { errorMessage: "User not found" });
         }
 
         const user = result.rows[0];
