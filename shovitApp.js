@@ -235,6 +235,7 @@ app.post("/login", async (req, res) => {
   
 app.get("/home", authenticateToken, async (req, res) => {
     try {
+        console.log(req.user);
         const filterMyDemands = req.query.filter === 'myDemands';
 
         const [result, userResult] = await Promise.all([
@@ -251,6 +252,7 @@ app.get("/home", authenticateToken, async (req, res) => {
             posted_time: calculatePostedTime(row.created_at)
         }));
 
+
         if (filterMyDemands) {
             filteredRequests = filteredRequests.filter(request =>
                 request.user_id === userData.user_id || request.accepted_by === userData.email
@@ -260,7 +262,6 @@ app.get("/home", authenticateToken, async (req, res) => {
                     ? `Accepted by - ${request.accepted_by}` 
                     : 'Yet to be accepted'
             }));
-            console.log(filteredRequests);   
         } else {
             filteredRequests = filteredRequests
                 .filter(request => request.accepted_by === null)
