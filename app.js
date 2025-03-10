@@ -73,7 +73,7 @@ const authenticateToken = (req, res, next) => {
             let profileStatusStr ="";
             if(dbUser.farmer_profile_completed) profileStatusStr+='farmer';
             if(dbUser.buyer_profile_completed) profileStatusStr+='buyer';
-            else profileStatusStr='incomplete';
+            if(!dbUser.farmer_profile_completed && !dbUser.buyer_profile_completed) profileStatusStr='incomplete';
             req.user = {
                 ...dbUser,
                 profileStatus:profileStatusStr
@@ -132,8 +132,7 @@ app.post("/postdemand", async (req, res) => {
   
       // Insert data into the requests table
       const query = `
-        INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location)
-        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+        
         INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location, total_amount)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
       `;
@@ -268,7 +267,7 @@ app.get('/home/logout', (req, res) => {
     res.redirect('/login');
 });
 
-app.get('/home/search', async (req, res) => {
+app.get('/home/search', authenticateToken,async (req, res) => {
     const searchQuery = req.query.query || '';
     console.log(searchQuery);
 
@@ -280,11 +279,17 @@ app.get('/home/search', async (req, res) => {
              OR location ILIKE $1`, 
             [`%${searchQuery}%`]
         );
+
+        const [userResult] = await Promise.all([
+            db.query('SELECT * FROM users WHERE email = $1', [req.user.email])
+        ]);
+
+        const userData = userResult.rows[0];
         result.rows.forEach(row => {
             row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
             row.proposals = formatProposals(row.proposals);
         })
-        res.render('home', { requests: result.rows });
+        res.render('home', { requests: result.rows, profileStatus: req.user.profileStatus, user: userData });
     } catch (error) {
         console.error('Error fetching search results:', error);
         res.status(500).send('Internal Server Error');
