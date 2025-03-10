@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from 'url';
-import bodyParser from "body-parser";  // ✅ Ensure body-parser is imported
+import bodyParser from "body-parser";  
 import pg from "pg";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";

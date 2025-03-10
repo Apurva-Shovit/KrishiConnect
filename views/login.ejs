@@ -9,38 +9,90 @@
     
 </head>
 
-<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+<body class="d-flex flex-column min-vh-100 bg-light">
     
-    <main class="form-signin w-100 m-auto" style="max-width: 500px;">
-        <form action="/login" method="POST">
-            <!-- KK logo -->
-            <div class="text-center">
-                <img class="mb-4" src="assets/logo_big.png" alt="Expill Logo" width="500" >
-            </div>
-            
-            <!-- <h1 class="h3 mb-3 fw-normal">Please sign in</h1> -->
-        
-            <div class="form-floating">
-                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com"style="border-radius: 20px;" name="username">
-                <label for="floatingInput">Email address</label>
-            </div>
-            <div class="form-floating mt-2">
-                <input type="password" class="form-control" id="floatingPassword" placeholder="Password"style="border-radius: 20px;" name="password">
-                <label for="floatingPassword">Password</label>
-            </div>
-        
-            <div class="form-check text-start my-3" >
-                <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">Remember me</label>
-            </div>
-            
-            <button class="btn btn-primary w-100 py-2 " type="submit" style="border-radius: 20px;">Sign in</button>
-            <p class="mt-5 mb-3 text-muted text-center">© KrishiConnect 2025</p>
-        </form>
-    </main>
 
-    <!-- Bootstrap Bundle with Popper (Moved to end of body for better performance) -->
+    <!-- header -->
+    <div class="container">
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+          <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+            <img src="assets/logo_smol.png"  height="42" alt="Logo" >
+      
+            <span class="fs-4" style="color: #3d6a25; margin-left: 10px;">KrishiConnect</span>
+          </a>
+      
+          <ul class="nav nav-pills">
+            <li class="nav-item"><a href="/register" class="nav-link active"  style="border-radius: 15px; background-color: #3d6a25;border-color: #3d6a25;" aria-current="page">Sign Up</a></li>
+      <li class="nav-item"><a href="/login" class="nav-link " style="color:#3d6a25">Sign In</a></li>
+      <li class="nav-item"><a href="/about" class="nav-link"style="color:#3d6a25">About Us</a></li>
+            
+          </ul>
+        </header>
+        </div>  
+
+    <!-- Flex container to center content horizontally -->
+    <div class="d-flex flex-grow-1 align-items-center justify-content-center">
+        <main class="container form-signin w-100 mx-auto" style="max-width: 500px;">
+            <form action="/login" method="POST">
+                <!-- KK logo -->
+                <div class="text-center">
+                    <img class="mb-4" src="assets/logo_big.png" alt="Expill Logo" width="500">
+                </div>
+            
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" style="border-radius: 20px;" name="username">
+                    <label for="floatingInput">Email address</label>
+                </div>
+                <div class="form-floating mt-2">
+                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password" style="border-radius: 20px;" name="password">
+                    <label for="floatingPassword">Password</label>
+                </div>
+            
+                <div class="form-check text-start my-3">
+                    <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault">
+                    <label class="form-check-label" for="flexCheckDefault">Remember me</label>
+                </div>
+                
+                <button class="btn btn-primary w-100 py-2" type="submit" style="border-radius: 20px; background-color: #3d6a25;border-color: #3d6a25;">Sign in</button>
+                <p class="mt-5 mb-3 text-muted text-center">© KrishiConnect 2025</p>
+            </form>
+        </main>
+    </div>
+
+    <!-- Footer stays at the bottom -->
+    <footer class="container mt-auto">
+        <div class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <div class="col-md-4 d-flex align-items-center">
+                <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+                    <img src="assets/logo_smol.png" height="30" alt="Logo">
+                </a>
+                <span class="mb-3 mb-md-0 text-body-secondary">© KrishiConnect 2025, Inc</span>
+            </div>
+    
+            <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+                <li class="ms-3">
+                    <a class="text-body-secondary" href="https://www.linkedin.com/in/dev1" target="_blank">
+                        <i class="bi bi-linkedin" style="font-size: 24px;"></i>
+                    </a>
+                </li>
+                <li class="ms-3">
+                    <a class="text-body-secondary" href="https://www.linkedin.com/in/dev2" target="_blank">
+                        <i class="bi bi-linkedin" style="font-size: 24px;"></i>
+                    </a>
+                </li>
+                <li class="ms-3">
+                    <a class="text-body-secondary" href="https://www.linkedin.com/in/dev3" target="_blank">
+                        <i class="bi bi-linkedin" style="font-size: 24px;"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </body>
+
+
 </html>
