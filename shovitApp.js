@@ -289,7 +289,6 @@ app.get('/home/search', authenticateToken, (req, res) => {
 });
 
 app.post('/submit-farmer-profile',authenticateToken, (req, res) => {
-    console.log(req.user);
     const { location, farmSize, cropsGrown, experience, farmingMethods } = req.body;
     const farmerProfile = {
         location,
@@ -315,7 +314,6 @@ app.post('/submit-farmer-profile',authenticateToken, (req, res) => {
 })
 
 app.post('/submit-buyer-profile', authenticateToken, async (req, res) => {
-    console.log('this is req.body',req.body);
     
     const { location, companyName, productsNeeded, preferredQuantities } = req.body;
 
@@ -329,7 +327,6 @@ app.post('/submit-buyer-profile', authenticateToken, async (req, res) => {
         rating: 0,
     };
 
-    console.log(buyerProfile);
     try {
         await db.query(
 
@@ -365,7 +362,6 @@ app.get('/home/request', async (req, res) => {
                 buyer_location: buyerProfile.location,
                 buyer_company: buyerProfile.companyName
             };
-            console.log(requestData);
             res.json(requestData);
         } else {
             res.status(404).json({ error: 'Request not found' });
@@ -424,6 +420,27 @@ app.get('/get-buyer-profile', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
+app.post('/home/AcceptRequest', authenticateToken, async (req, res) => {
+    const { request_id } = req.body;
+
+    try {
+        const userEmail = req.user.email;
+
+        await db.query(
+            `UPDATE requests 
+             SET accepted_by = $1 
+             WHERE request_id = $2`,
+            [userEmail, request_id]
+        );
+
+        res.redirect('/home');
+    } catch (err) {
+        console.error('Error accepting request:', err);
+        res.status(500).send('Error accepting request.');
+    }
+});
+
 
 
 
