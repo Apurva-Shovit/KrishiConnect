@@ -12,7 +12,7 @@ CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    password TEXT NOT NULL,
     phone_number VARCHAR(15),
     location VARCHAR(255),
     buyer_profile JSONB,
