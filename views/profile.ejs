@@ -209,6 +209,52 @@
     </div>
   </footer>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const farmerForm = document.getElementById('farmerProfileForm');
+        const farmerSubmitButton = farmerForm.querySelector('button[type="submit"]');
+        const initialFarmerData = {};
+
+        Array.from(farmerForm.elements).forEach(input => {
+            if (input.tagName === 'INPUT') {
+                initialFarmerData[input.name] = input.value;
+                input.addEventListener('input', checkFarmerChanges);
+            }
+        });
+
+        function checkFarmerChanges() {
+            const isChanged = Array.from(farmerForm.elements).some(input =>
+                input.tagName === 'INPUT' && input.value !== initialFarmerData[input.name]
+            );
+            farmerSubmitButton.disabled = !isChanged;
+        }
+
+        farmerSubmitButton.disabled = true;
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const buyerForm = document.getElementById('buyerProfileForm');
+        const buyerSubmitButton = buyerForm.querySelector('button[type="submit"]');
+        const initialBuyerData = {};
+
+        Array.from(buyerForm.elements).forEach(input => {
+            if (input.tagName === 'INPUT') {
+                initialBuyerData[input.name] = input.value;
+                input.addEventListener('input', checkBuyerChanges);
+            }
+        });
+
+        function checkBuyerChanges() {
+            const isChanged = Array.from(buyerForm.elements).some(input =>
+                input.tagName === 'INPUT' && input.value !== initialBuyerData[input.name]
+            );
+            buyerSubmitButton.disabled = !isChanged;
+        }
+
+        buyerSubmitButton.disabled = true;
+    });
+  </script>
+
 
 </body>
 
