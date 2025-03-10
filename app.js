@@ -231,29 +231,36 @@ app.post("/login", async (req, res) => {
     }
 });
   
-app.get("/home", authenticateToken, async (req, res) => {
+app.get("/home", authenticateToken, async (req, res) => { 
     try {
+        const searchQuery = req.query.searchQuery || '';
+
+        const queryText = searchQuery 
+            ? `SELECT * FROM requests 
+               WHERE (crop_name ILIKE $1 
+               OR description ILIKE $1
+               OR location ILIKE $1)
+               ORDER BY created_at DESC;`
+            : `SELECT * FROM requests ORDER BY created_at DESC;`;
+
+        const queryParams = searchQuery ? [`%${searchQuery}%`] : [];
 
         const [result, userResult] = await Promise.all([
-            db.query('SELECT * FROM requests ORDER BY created_at DESC;'),
+            db.query(queryText, queryParams),
             db.query('SELECT * FROM users WHERE email = $1', [req.user.email])
         ]);
 
         const userData = userResult.rows[0];
-        
-        result.rows.forEach(row => {
-            row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
-            row.proposals = formatProposals(row.proposals);
-        })
-        result.rows = result.rows.filter(request => request.accepted_by === null);
 
+        result.rows = result.rows
+            .filter(request => request.accepted_by === null)
+            .map(row => ({
+                ...row,
+                delivery_deadline: row.delivery_deadline.toISOString().split('T')[0],
+                proposals: formatProposals(row.proposals),
+                posted_time: calculatePostedTime(row.created_at)
+            }));
 
-        result.rows = result.rows.map(row => ({
-            ...row,
-            posted_time: calculatePostedTime(row.created_at)
-        }));
-        console.log(result.rows);
-        console.log(req.user)
         res.render('home', { 
             requests: result.rows,
             profileStatus: req.user.profileStatus,
@@ -262,41 +269,18 @@ app.get("/home", authenticateToken, async (req, res) => {
     } catch (err) {
         console.error('Error fetching data:', err);
         res.status(500).send('Server Error');
-    } // Pass user data to EJS
+    }
 });
+
 
 app.get('/home/logout', (req, res) => {
     res.clearCookie('token');
     res.redirect('/login');
 });
 
-app.get('/home/search', authenticateToken,async (req, res) => {
+app.get('/home/search', authenticateToken, (req, res) => {
     const searchQuery = req.query.query || '';
-    console.log(searchQuery);
-
-    try {
-        const result = await db.query(
-            `SELECT * FROM requests 
-             WHERE crop_name ILIKE $1 
-             OR description ILIKE $1
-             OR location ILIKE $1`, 
-            [`%${searchQuery}%`]
-        );
-
-        const [userResult] = await Promise.all([
-            db.query('SELECT * FROM users WHERE email = $1', [req.user.email])
-        ]);
-
-        const userData = userResult.rows[0];
-        result.rows.forEach(row => {
-            row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
-            row.proposals = formatProposals(row.proposals);
-        })
-        res.render('home', { requests: result.rows, profileStatus: req.user.profileStatus, user: userData });
-    } catch (error) {
-        console.error('Error fetching search results:', error);
-        res.status(500).send('Internal Server Error');
-    }
+    res.redirect(`/home?searchQuery=${encodeURIComponent(searchQuery)}`);
 });
 
 app.post('/submit-farmer-profile',authenticateToken, (req, res) => {
