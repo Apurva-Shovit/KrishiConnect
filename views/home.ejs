@@ -112,7 +112,7 @@
                     </div>
                     <!-- input search -->
                     <div class="row" style="width:100%">
-                        <form id="searchForm" method="GET" action="/home/search">
+                        <form id="searchForm" method="GET" action="/home/search" class="d-flex align-items-center">
                             <input 
                                 name="query" 
                                 aria-labelledby="cfe-job-search-label" 
@@ -123,10 +123,14 @@
                                 spellcheck="false" 
                                 placeholder="Search for crop-name, description or location" 
                                 value="" 
-                                class="air3-typeahead-input-fake air3-input form-control"
-                                style="width: 100%;">
-                            <button type="submit" class="btn btn-primary mt-2" style="width: min-content">Search</button>
+                                class="air3-typeahead-input-fake air3-input form-control me-2"
+                                style="flex: 1; min-width: 200px;">
+                            <button type="submit" class="btn btn-primary" 
+                                style="border-radius: 15px; background-color: #3d6a25; border-color: #198754;">
+                                Search
+                            </button>
                         </form>
+                        
                         
                     </div>
 
