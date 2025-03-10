@@ -20,8 +20,8 @@ app.use(cookieParser());
 const db = new pg.Client({
     user: "postgres",
     host: "localhost",
-    database: "KrishiConnect",
-    password: "password",
+    database: "KrishiConnect1",
+    password: "rootuser",
     port: 5432,
 });
 
@@ -138,7 +138,6 @@ app.post("/postdemand", async (req, res) => {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
       `;
   
-      const values = [crop_name, quantity, price_offered, delivery_deadline, description, spendingcatagoory, location];
       const values = [crop_name, quantity, price_offered, delivery_deadline, description, spendingcatagoory, location,price_offered*quantity];
   
       const result = await db.query(query, values);

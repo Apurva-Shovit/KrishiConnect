@@ -102,7 +102,7 @@
         <div class="container-fluid">
             <div class="row justify-content-center" style="margin-left: 10%; margin-right: 10%;">
 
-                <div class="col-lg-auto" style="width:55%">
+                <div class="col-lg-auto" style="width:60%">
 
                     <!-- image -->
                     <div class="row" style="width:100%; padding-bottom: 20px;">
@@ -162,20 +162,28 @@
                                             Deadline: <%= request.delivery_deadline %>
                                         </div>
                                     </div>
-                                    <div style="display: flex; align-items: center; color: #6c757d; margin-top: 8px; font-size: 0.9rem;">
-                                        <i class="bi bi-check-circle-fill" style="margin-right: 4px;"></i>
-                                        <%= request.payment_verified ? 'Payment Verified' : 'Payment Pending' %>
-                                        <span style="margin: 0 8px;">⭐ ⭐ ⭐ ⭐ <%= request.rating %></span>
-                                        <i class="bi bi-geo-alt" style="margin-left: 12px; margin-right: 4px;"></i>
-                                        <%= request.location %>
-                                        <span style="margin-left: 12px;">Proposals: <%= request.proposals %></span>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                                        <div>
+                                            <i class="bi bi-check-circle-fill" style="margin-right: 4px;"></i>
+                                            <%= request.payment_verified ? 'Payment Verified' : 'Payment Pending' %>
+                                            <span style="margin: 0 8px;">⭐ ⭐ ⭐ ⭐ <%= request.rating %></span>
+                                            <i class="bi bi-geo-alt" style="margin-left: 12px; margin-right: 4px;"></i>
+                                            <%= request.location %>
+                                            <span style="margin-left: 12px;">Proposals: <%= request.proposals %></span>
+                                        </div>
+                                        <form method="POST" action="/accept-request">
+                                            <input type="hidden" name="request_id" value="<%= request.id %>">
+                                            <button type="submit" class="btn btn-success">Accept Request</button>
+                                        </form>
                                     </div>
+                                    
                                 </div>
                             </div>
                         <% }) %>
                     <% } else { %>
                         <p>No matching results found.</p>
                     <% } %>
+                    
                             
 
                     
