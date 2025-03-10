@@ -20,8 +20,8 @@ app.use(cookieParser());
 const db = new pg.Client({
     user: "postgres",
     host: "localhost",
-    database: "KrishiConnect",
-    password: "password",
+    database: "KrishiConnect1",
+    password: "rootuser",
     port: 5432,
 });
 
@@ -170,5 +170,27 @@ app.get('/home/logout', (req, res) => {
     res.redirect('/login');
 });
 
+app.get('/home/search', async (req, res) => {
+    const searchQuery = req.query.query || '';
+    console.log(searchQuery);
+
+    try {
+        const result = await db.query(
+            `SELECT * FROM requests 
+             WHERE crop_name ILIKE $1 
+             OR description ILIKE $1
+             OR location ILIKE $1`, 
+            [`%${searchQuery}%`]
+        );
+        result.rows.forEach(row => {
+            row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
+            row.proposals = formatProposals(row.proposals);
+        })
+        res.render('home', { requests: result.rows });
+    } catch (error) {
+        console.error('Error fetching search results:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 // Start the server
 app.listen(port, () => console.log(`Server running on port ${port}`));
