@@ -25,6 +25,17 @@ const db = new pg.Client({
     port: 5432,
 });
 
+function calculatePostedTime(createdAt) {
+    const now = new Date();
+    const createdDate = new Date(createdAt);
+    const diffInSeconds = Math.floor((now - createdDate) / 1000);
+
+    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    return `${Math.floor(diffInSeconds / 86400)} days ago`;
+}
+
 
 db.connect();
 
@@ -58,13 +69,14 @@ const authenticateToken = (req, res, next) => {
             }
 
             const dbUser = result.rows[0];
+
+            let profileStatusStr ="";
+            if(dbUser.farmer_profile_completed) profileStatusStr+='farmer';
+            if(dbUser.buyer_profile_completed) profileStatusStr+='buyer';
+            else profileStatusStr='incomplete';
             req.user = {
                 ...dbUser,
-                profileStatus: dbUser.farmer_profile_completed
-                    ? 'farmer'
-                    : dbUser.buyer_profile_completed
-                    ? 'buyer'
-                    : 'incomplete'
+                profileStatus:profileStatusStr
             };
 
             next();
@@ -94,11 +106,50 @@ app.get("/register", (req, res) => {
     res.render("register.ejs", {errorMessage : null});
 });
 
+// Secure Route for Posting Demand
+app.get("/postdemandpage", authenticateToken, (req, res) => {
+    try {
+        res.render("postdemand.ejs", { user: req.user }); // Pass user data to EJS
+    } catch (err) {
+        console.error("Error rendering post demand page:", err);
+        res.status(500).send("Server Error");
+    }
+});
 
 
+
+app.post("/postdemand", async (req, res) => {
+    try {
+      const {
+        crop_name,
+        quantity,
+        price_offered,
+        delivery_deadline,
+        description,
+        spendingcatagoory, // Corrected name below in query
+        location
+      } = req.body;
+  
+      // Insert data into the requests table
+      const query = `
+        INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location)
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+      `;
+  
+      const values = [crop_name, quantity, price_offered, delivery_deadline, description, spendingcatagoory, location];
+  
+      const result = await db.query(query, values);
+  
+      // Redirect or send a response after successful insertion
+      res.redirect("/home");
+    } catch (error) {
+      console.error("Error posting demand:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 //  register user
 app.post("/reguser", async (req, res) => {
-    console.log("Received registration request"); // ✅ Debug log
+    console.log("Received registration request"); 
     console.log("Request Body:", req.body);
     const { fname, lname, username: email, password } = req.body;
 
@@ -121,7 +172,7 @@ app.post("/reguser", async (req, res) => {
             console.log("Hashed Password:", hash);
 
             await db.query(
-                "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, 'user')",
+                "INSERT INTO users (name, email, password) VALUES ($1, $2, $3)",
                 [fname+" "+lname, email, hash]
             );
 
@@ -176,20 +227,29 @@ app.post("/login", async (req, res) => {
     }
 });
   
-
 app.get("/home", authenticateToken, async (req, res) => {
     try {
 
         const [result, userResult] = await Promise.all([
-            db.query('SELECT * FROM requests'),
+            db.query('SELECT * FROM requests ORDER BY created_at DESC;'),
             db.query('SELECT * FROM users WHERE email = $1', [req.user.email])
         ]);
 
         const userData = userResult.rows[0];
+        
         result.rows.forEach(row => {
             row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
             row.proposals = formatProposals(row.proposals);
         })
+        
+        result.rows = result.rows.filter(request => request.accepted_by === null);
+
+
+        result.rows = result.rows.map(row => ({
+            ...row,
+            posted_time: calculatePostedTime(row.created_at)
+        }));
+        console.log(result.rows);
         console.log(req.user)
         res.render('home', { 
             requests: result.rows,
@@ -201,6 +261,7 @@ app.get("/home", authenticateToken, async (req, res) => {
         res.status(500).send('Server Error');
     } // Pass user data to EJS
 });
+
 app.get('/home/logout', (req, res) => {
     res.clearCookie('token');
     res.redirect('/login');
@@ -283,6 +344,8 @@ app.post('/submit-buyer-profile', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Failed to submit buyer profile' });
     }
 });
+
+
 
 // Start the server
 app.listen(port, () => console.log(`Server running on port ${port}`));

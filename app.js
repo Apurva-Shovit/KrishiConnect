@@ -241,6 +241,8 @@ app.get("/home", authenticateToken, async (req, res) => {
             row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
             row.proposals = formatProposals(row.proposals);
         })
+        result.rows = result.rows.filter(request => request.accepted_by === null);
+
 
         result.rows = result.rows.map(row => ({
             ...row,
