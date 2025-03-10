@@ -105,6 +105,9 @@ app.get("/login", (req, res) => {
 app.get("/register", (req, res) => {
     res.render("register.ejs", {errorMessage : null});
 });
+app.get("/about", (req, res) => {
+    res.render("about.ejs", {errorMessage : null});
+});
 
 // Secure Route for Posting Demand
 app.get("/postdemandpage", authenticateToken, (req, res) => {
