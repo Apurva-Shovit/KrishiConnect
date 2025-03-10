@@ -20,8 +20,8 @@ app.use(cookieParser());
 const db = new pg.Client({
     user: "postgres",
     host: "localhost",
-    database: "KrishiConnect1",
-    password: "rootuser",
+    database: "KrishiConnect",
+    password: "password",
     port: 5432,
 });
 
@@ -83,8 +83,47 @@ app.get("/home", authenticateToken, async (req, res) => {
         res.status(500).send('Server Error');
     } // Pass user data to EJS
 });
+// Secure Route for Posting Demand
+app.get("/postdemandpage", authenticateToken, (req, res) => {
+    try {
+        res.render("postdemand.ejs", { user: req.user }); // Pass user data to EJS
+    } catch (err) {
+        console.error("Error rendering post demand page:", err);
+        res.status(500).send("Server Error");
+    }
+});
 
 
+
+app.post("/postdemand", async (req, res) => {
+    try {
+      const {
+        crop_name,
+        quantity,
+        price_offered,
+        delivery_deadline,
+        description,
+        spendingcatagoory, // Corrected name below in query
+        location
+      } = req.body;
+  
+      // Insert data into the requests table
+      const query = `
+        INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location)
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+      `;
+  
+      const values = [crop_name, quantity, price_offered, delivery_deadline, description, spendingcatagoory, location];
+  
+      const result = await db.query(query, values);
+  
+      // Redirect or send a response after successful insertion
+      res.redirect("/home");
+    } catch (error) {
+      console.error("Error posting demand:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
 //  register user
 app.post("/reguser", async (req, res) => {
     console.log("Received registration request"); // ✅ Debug log
@@ -180,17 +219,20 @@ app.get('/home/search', async (req, res) => {
              WHERE crop_name ILIKE $1 
              OR description ILIKE $1
              OR location ILIKE $1`, 
-            [`%${searchQuery}%`]
+            [`%${searchQuery}%`] 
         );
+
         result.rows.forEach(row => {
             row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
             row.proposals = formatProposals(row.proposals);
-        })
+        });
+
         res.render('home', { requests: result.rows });
     } catch (error) {
         console.error('Error fetching search results:', error);
         res.status(500).send('Internal Server Error');
     }
 });
+
 // Start the server
 app.listen(port, () => console.log(`Server running on port ${port}`));
