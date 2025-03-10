@@ -20,8 +20,8 @@ app.use(cookieParser());
 const db = new pg.Client({
     user: "postgres",
     host: "localhost",
-    database: "KrishiConnect",
-    password: "password",
+    database: "KrishiConnect1",
+    password: "rootuser",
     port: 5432,
 });
 
@@ -48,6 +48,14 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+function formatProposals(proposals) {
+    const lowerLimit = Math.floor(proposals / 5) * 5;
+    const upperLimit = lowerLimit + 5;
+    return `${lowerLimit} to ${upperLimit}`;
+}
+
+app.set('view engine', 'ejs');
+
 // routessss 
 app.get("/", (req, res) => {
     res.render("landing.ejs");
@@ -58,8 +66,22 @@ app.get("/login", (req, res) => {
 app.get("/register", (req, res) => {
     res.render("register.ejs");
 });
-app.get("/home", authenticateToken, (req, res) => {
-    res.render("home.ejs", { user: req.user }); // Pass user data to EJS
+app.get("/home", authenticateToken, async (req, res) => {
+    try {
+        const result = await db.query('SELECT * FROM requests');
+        console.log(result.rows);
+        result.rows.forEach(row => {
+            row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
+            row.proposals = formatProposals(row.proposals);
+        })
+        res.render('home', { 
+            requests: result.rows ,
+            user: req.user
+        });
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        res.status(500).send('Server Error');
+    } // Pass user data to EJS
 });
 
 
@@ -74,7 +96,8 @@ app.post("/reguser", async (req, res) => {
         const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [email]);
 
         if (checkResult.rows.length > 0) {
-            return res.send("Email already exists. Try logging in.");
+            
+            return res.render('register.ejs', { errorMessage : 'user already exists'});
         }
 
         // Hash password and store user
@@ -91,7 +114,7 @@ app.post("/reguser", async (req, res) => {
                 [fname+" "+lname, email, hash]
             );
 
-            res.send("User registed!"); // Redirect after success
+            res.redirect("login"); // Redirect after success
         });
 
     } catch (err) {
@@ -100,7 +123,7 @@ app.post("/reguser", async (req, res) => {
     }
 });
 
-//login suer
+//login user
 app.post("/login", async (req, res) => {
     const email = req.body.username;
     const loginPassword = req.body.password;
@@ -117,7 +140,7 @@ app.post("/login", async (req, res) => {
         const isMatch = await bcrypt.compare(loginPassword, storedHashedPassword);
 
         if (!isMatch) {
-            return res.status(401).json({ error: "Incorrect password" });
+            return res.render('login', {errorMessage : 'incorrect login or password'});
         }
 
         // Create JWT token
@@ -134,7 +157,7 @@ app.post("/login", async (req, res) => {
             maxAge: 3600000   // Expire in 1 hour
         });
 
-        res.json({ message: "Login Success!" });
+        res.redirect('home');
 
     } catch (err) {
         console.error("Database error:", err);
@@ -142,6 +165,10 @@ app.post("/login", async (req, res) => {
     }
 });
   
+app.get('/home/logout', (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/login');
+});
 
 // Start the server
 app.listen(port, () => console.log(`Server running on port ${port}`));

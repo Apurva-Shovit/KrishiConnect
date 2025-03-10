@@ -88,35 +88,45 @@ app.post("/reguser", async (req, res) => {
 
 //login suer
 app.post("/login", async (req, res) => {
-    const email = req.body.username; // Changed from `username` to `email`
+    const email = req.body.username;
     const loginPassword = req.body.password;
-    console.log(email+" : "+loginPassword);
-  
+
     try {
-      const result = await db.query("SELECT * FROM users WHERE email = $1", [email]);
-  
-      if (result.rows.length === 0) {
-        return res.status(400).send("User not found");
-      }
-  
-      const user = result.rows[0];
-      const storedHashedPassword = user.password;
-  
-      // Compare the password securely
-      const isMatch = await bcrypt.compare(loginPassword, storedHashedPassword);
-  
-      if (isMatch) {
-        res.redirect("home"); // Redirect to the secrets page upon successful login
-      } else {
-        res.status(401).send("Incorrect Password"); // Unauthorized access
-      }
+        const result = await db.query("SELECT * FROM users WHERE email = $1", [email]);
+
+        if (result.rows.length === 0) {
+            return res.status(400).json({ error: "User not found" });
+        }
+
+        const user = result.rows[0];
+        const storedHashedPassword = user.password;
+        const isMatch = await bcrypt.compare(loginPassword, storedHashedPassword);
+
+        if (!isMatch) {
+            return res.status(401).json({ error: "Incorrect password" });
+        }
+
+        // Create JWT token
+        const accessToken = jwt.sign(
+            { email: user.email, id: user.id },
+            JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        // Send token in a cookie
+        res.cookie("token", accessToken, {
+            httpOnly: true,   // Prevent client-side JS access
+            secure: false,    // Set `true` if using HTTPS
+            maxAge: 3600000   // Expire in 1 hour
+        });
+
+        res.json({ message: "Login Success!" });
+
     } catch (err) {
-      console.error("Database error:", err);
-      res.status(500).send("Server error");
+        console.error("Database error:", err);
+        res.status(500).json({ error: "Server error" });
     }
-  });
-
-
+});
 
 const verifyToken = (req, res, next) => {
     const token = req.cookies.token;
@@ -145,7 +155,10 @@ app.get('/home', verifyToken, async (req, res) => {
             row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
             row.proposals = formatProposals(row.proposals);
         })
-        res.render('home', { requests: result.rows });
+        res.render('home', { 
+            requests: result.rows ,
+            user: req.user
+        });
     } catch (err) {
         console.error('Error fetching data:', err);
         res.status(500).send('Server Error');
