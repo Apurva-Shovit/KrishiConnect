@@ -20,10 +20,21 @@ app.use(cookieParser());
 const db = new pg.Client({
     user: "postgres",
     host: "localhost",
-    database: "KrishiConnect",
-    password: "password",
+    database: "KrishiConnect1",
+    password: "rootuser",
     port: 5432,
 });
+
+function calculatePostedTime(createdAt) {
+    const now = new Date();
+    const createdDate = new Date(createdAt);
+    const diffInSeconds = Math.floor((now - createdDate) / 1000);
+
+    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    return `${Math.floor(diffInSeconds / 86400)} days ago`;
+}
 
 
 db.connect();
@@ -33,18 +44,45 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 const authenticateToken = (req, res, next) => {
-    const token = req.cookies.token;  // Get token from cookies
+    const token = req.cookies.token;
 
     if (!token) {
-        return res.status(401).redirect("/login"); // Redirect to login if no token
+        return res.status(401).redirect("/login");
     }
 
-    jwt.verify(token, JWT_SECRET, (err, user) => {
+    jwt.verify(token, JWT_SECRET, async (err, user) => {
         if (err) {
             return res.status(403).send("Invalid token");
         }
-        req.user = user;
-        next();
+
+        try {
+            const email = user.email;
+
+            const result = await db.query(
+                `SELECT email, farmer_profile_completed, buyer_profile_completed 
+                 FROM users WHERE email = $1`, 
+                [email]
+            );
+
+            if (result.rows.length === 0) {
+                return res.status(404).send("User not found");
+            }
+
+            const dbUser = result.rows[0];
+            req.user = {
+                ...dbUser,
+                profileStatus: dbUser.farmer_profile_completed
+                    ? 'farmer'
+                    : dbUser.buyer_profile_completed
+                    ? 'buyer'
+                    : 'incomplete'
+            };
+
+            next();
+        } catch (dbError) {
+            console.error("Database error:", dbError);
+            return res.status(500).send("Internal Server Error");
+        }
     });
 };
 
@@ -66,23 +104,7 @@ app.get("/login", (req, res) => {
 app.get("/register", (req, res) => {
     res.render("register.ejs", {errorMessage : null});
 });
-app.get("/home", authenticateToken, async (req, res) => {
-    try {
-        const result = await db.query('SELECT * FROM requests');
-        console.log(result.rows);
-        result.rows.forEach(row => {
-            row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
-            row.proposals = formatProposals(row.proposals);
-        })
-        res.render('home', { 
-            requests: result.rows ,
-            user: req.user
-        });
-    } catch (err) {
-        console.error('Error fetching data:', err);
-        res.status(500).send('Server Error');
-    } // Pass user data to EJS
-});
+
 // Secure Route for Posting Demand
 app.get("/postdemandpage", authenticateToken, (req, res) => {
     try {
@@ -204,6 +226,38 @@ app.post("/login", async (req, res) => {
     }
 });
   
+app.get("/home", authenticateToken, async (req, res) => {
+    try {
+
+        const [result, userResult] = await Promise.all([
+            db.query('SELECT * FROM requests ORDER BY created_at DESC;'),
+            db.query('SELECT * FROM users WHERE email = $1', [req.user.email])
+        ]);
+
+        const userData = userResult.rows[0];
+        
+        result.rows.forEach(row => {
+            row.delivery_deadline = row.delivery_deadline.toISOString().split('T')[0];
+            row.proposals = formatProposals(row.proposals);
+        })
+
+        result.rows = result.rows.map(row => ({
+            ...row,
+            posted_time: calculatePostedTime(row.created_at)
+        }));
+        console.log(result.rows);
+        console.log(req.user)
+        res.render('home', { 
+            requests: result.rows,
+            profileStatus: req.user.profileStatus,
+            user: userData
+        });
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        res.status(500).send('Server Error');
+    } // Pass user data to EJS
+});
+
 app.get('/home/logout', (req, res) => {
     res.clearCookie('token');
     res.redirect('/login');
@@ -231,5 +285,61 @@ app.get('/home/search', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+app.post('/submit-farmer-profile',authenticateToken, (req, res) => {
+    console.log(req.user);
+    const { location, farmSize, cropsGrown, experience, farmingMethods } = req.body;
+    const farmerProfile = {
+        location,
+        farmSize: parseFloat(farmSize),
+        cropsGrown: cropsGrown.split(',').map(crop => crop.trim()),
+        experience: parseInt(experience),
+        farmingMethods: farmingMethods.split(',').map(method => method.trim()),
+        past_deals:0,
+        rating:0,
+        profileComplete: true
+    };
+
+    const query = `
+        UPDATE users 
+        SET farmer_profile = $1, farmer_profile_completed = $2 
+        WHERE email = $3
+    `;
+
+    db.query(query, [farmerProfile, true, req.user.email])
+        .then(() => res.status(200).redirect('home'))
+        .catch(err => res.status(500).json({ error: 'Failed to update profile', details: err.message }));
+
+})
+
+app.post('/submit-buyer-profile', authenticateToken, async (req, res) => {
+    console.log('this is req.body',req.body);
+    
+    const { location, companyName, productsNeeded, preferredQuantities } = req.body;
+
+    const buyerProfile = {
+        location,
+        companyName,
+        productsNeeded: productsNeeded.split(',').map(product => product.trim()),
+        preferredQuantities,
+        paymentReliability: 1.0,
+        past_deals: 0,
+        rating: 0,
+    };
+
+    console.log(buyerProfile);
+    try {
+        await db.query(
+
+            'UPDATE users SET buyer_profile = $1, buyer_profile_completed = $3 WHERE email = $2',
+            [buyerProfile, req.user.email ,true]
+        );
+        res.status(200).redirect('home');
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Failed to submit buyer profile' });
+    }
+});
+
 // Start the server
 app.listen(port, () => console.log(`Server running on port ${port}`));
