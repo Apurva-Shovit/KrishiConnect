@@ -17,13 +17,15 @@ const __dirname = path.dirname(__filename);
 const saltRounds = 10;
 const port = 3000;
 app.use(cookieParser());
-const db = new Client({
+const db = new pg.Client({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
 });
+
+
 
 function calculatePostedTime(createdAt) {
     const now = new Date();
