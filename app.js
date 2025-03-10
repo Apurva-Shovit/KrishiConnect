@@ -61,7 +61,7 @@ const authenticateToken = (req, res, next) => {
             const email = user.email;
 
             const result = await db.query(
-                `SELECT email, farmer_profile_completed, buyer_profile_completed 
+                `SELECT user_id,email, farmer_profile_completed, buyer_profile_completed 
                  FROM users WHERE email = $1`, 
                 [email]
             );
@@ -123,36 +123,42 @@ app.get("/postdemandpage", authenticateToken, (req, res) => {
 
 
 
-app.post("/postdemand", async (req, res) => {
+app.post("/postdemand", authenticateToken, async (req, res) => {
     try {
-      const {
-        crop_name,
-        quantity,
-        price_offered,
-        delivery_deadline,
-        description,
-        spendingcatagoory, // Corrected name below in query
-        location
-      } = req.body;
-  
-      // Insert data into the requests table
-      const query = `
-        
-        INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location, total_amount)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
-      `;
-  
-      const values = [crop_name, quantity, price_offered, delivery_deadline, description, spendingcatagoory, location,price_offered*quantity];
-  
-      const result = await db.query(query, values);
-  
-      // Redirect or send a response after successful insertion
-      res.redirect("/home");
+        const {
+            crop_name,
+            quantity,
+            price_offered,
+            delivery_deadline,
+            description,
+            spendingcatagoory,
+            location
+        } = req.body;
+
+        const query = `
+            INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location, total_amount, user_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;
+        `;
+
+        const values = [
+            crop_name,
+            quantity,
+            price_offered,
+            delivery_deadline,
+            description,
+            spendingcatagoory,
+            location,
+            price_offered * quantity,
+            req.user.user_id 
+        ];
+
+        await db.query(query, values);
+        res.redirect("/home");
     } catch (error) {
-      console.error("Error posting demand:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+        console.error("Error posting demand:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-  });
+});
 //  register user
 app.post("/reguser", async (req, res) => {
     console.log("Received registration request"); 
@@ -256,6 +262,7 @@ app.get("/home", authenticateToken, async (req, res) => {
 
         result.rows = result.rows
             .filter(request => request.accepted_by === null)
+            .filter(request => request.user_id != userData.user_id)
             .map(row => ({
                 ...row,
                 delivery_deadline: row.delivery_deadline.toISOString().split('T')[0],
