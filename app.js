@@ -22,6 +22,8 @@ const db = new pg.Client({
     host: "localhost",
     database: "KrishiConnect1",
     password: "rootuser",
+    database: "KrishiConnect",
+    password: "password",
     port: 5432,
 });
 
@@ -133,9 +135,12 @@ app.post("/postdemand", async (req, res) => {
       const query = `
         INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location)
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+        INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location, total_amount)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
       `;
   
       const values = [crop_name, quantity, price_offered, delivery_deadline, description, spendingcatagoory, location];
+      const values = [crop_name, quantity, price_offered, delivery_deadline, description, spendingcatagoory, location,price_offered*quantity];
   
       const result = await db.query(query, values);
   
