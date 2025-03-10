@@ -37,18 +37,20 @@
           
   
           <ul class="nav col-12 col-lg-auto my-2 mx-auto my-md-0 text-small d-flex justify-content-center">
-            <li>
-                <a href="/home" class="nav-link text-white d-flex flex-column align-items-center ">
-                  <i class="bi bi-house text-warning " style="font-size: 22px;"></i>
-                  Home
-                </a>
-              </li>
-              <li>
-                    <a href="/myDemands" class="nav-link text-white d-flex flex-column align-items-center">
-                  <i class="bi bi-card-text" style="font-size: 22px;"></i>
-                  MyDemands
-                </a>
-              </li>
+                <li>
+                    <a href="/home" class="nav-link text-white d-flex flex-column align-items-center" onclick="highlightLink(this)">
+                        <i class="bi bi-house text-warning" id="homeIcon" style="font-size: 22px;"></i>
+                        Home
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="/home?filter=myDemands" class="nav-link text-white d-flex flex-column align-items-center" onclick="highlightLink(this)">
+                        <i class="bi bi-card-text" id="myDemandsIcon" style="font-size: 22px;"></i>
+                        MyDemands
+                    </a>
+                </li>
+            
               <li>
                 <a href="#" class="nav-link text-white d-flex flex-column align-items-center">
                   <i class="bi bi-bell" style="font-size: 22px;"></i>
@@ -162,14 +164,6 @@
                                     onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.1)';" 
                                     onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
                     
-                                    <div style="position: absolute; top: 10px; right: 10px; display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                                        <i class="bi bi-arrow-up" onclick="vote(this, 'up')" style="cursor: pointer; font-size: 1.2rem; color: #198754;"></i>
-                                        <span class="upvote-count" style="font-size: 0.9rem; color: #198754;">0</span>
-                    
-                                        <i class="bi bi-arrow-down" onclick="vote(this, 'down')" style="cursor: pointer; font-size: 1.2rem; color: #dc3545;"></i>
-                                        <span class="downvote-count" style="font-size: 0.9rem; color: #dc3545;">0</span>
-                                    </div>
-                    
                                     <div style="color: #6c757d; font-size: 0.8rem; margin-bottom: 2px;">
                                         Posted <%= request.posted_time %> 
                                     </div>
@@ -196,12 +190,25 @@
                                             <%= request.location %>
                                             <span style="margin-left: 12px;">Proposals: <%= request.proposals %></span>
                                         </div>
-                                        <button 
-                                            type="button" 
-                                            class="btn btn-success" 
-                                            onclick="fetchRequestDetails('<%= request.request_id %>')">
-                                            Accept Request
-                                        </button>
+                    
+                                        <% if (request.user_id === user.user_id) { %>
+                                            <button class="btn btn-primary" disabled> 
+                                                <%= request.accepted_by 
+                                                    ? `Accepted by ${request.accepted_by}` 
+                                                    : 'Yet to be Accepted' %>
+                                            </button>
+                                        <% } else if (request.accepted_by === user.email) { %>
+                                            <button class="btn btn-warning" disabled>
+                                                Accepted by You
+                                            </button>
+                                        <% } else { %>
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-success" 
+                                                onclick="fetchRequestDetails('<%= request.request_id %>')">
+                                                Accept Request
+                                            </button>
+                                        <% } %>
                                     </div>
                                 </div>
                             </div>
@@ -209,6 +216,7 @@
                     <% } else { %>
                         <p>No matching results found.</p>
                     <% } %>
+                    
                     
                     
                     
@@ -401,6 +409,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
 
     <script>
+    window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const filter = urlParams.get('filter');
+
+        document.getElementById('homeIcon').classList.remove('text-warning');
+        document.getElementById('myDemandsIcon').classList.remove('text-warning');
+
+        if (filter === 'myDemands') {
+            document.getElementById('myDemandsIcon').classList.add('text-warning');
+        } else {
+            document.getElementById('homeIcon').classList.add('text-warning');
+        }
+    };
+
+    function highlightLink(element) {
+        document.getElementById('homeIcon').classList.remove('text-warning');
+        document.getElementById('myDemandsIcon').classList.remove('text-warning');
+
+        const icon = element.querySelector('i');
+        icon.classList.add('text-warning');
+    }
+
     const chatButton = document.getElementById("chatbot-icon");
     const chatWindow = document.getElementById("chat-window");
     const closeChat = document.getElementById("close-chat");

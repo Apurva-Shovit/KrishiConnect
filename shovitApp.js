@@ -233,43 +233,44 @@ app.post("/login", async (req, res) => {
     }
 });
   
-app.get("/home", authenticateToken, async (req, res) => { 
+app.get("/home", authenticateToken, async (req, res) => {
     try {
-        const searchQuery = req.query.searchQuery || '';
-
-        const queryText = searchQuery 
-            ? `SELECT * FROM requests 
-               WHERE (crop_name ILIKE $1 
-               OR description ILIKE $1
-               OR location ILIKE $1)
-               ORDER BY created_at DESC;`
-            : `SELECT * FROM requests ORDER BY created_at DESC;`;
-
-        const queryParams = searchQuery ? [`%${searchQuery}%`] : [];
+        const filterMyDemands = req.query.filter === 'myDemands';
 
         const [result, userResult] = await Promise.all([
-            db.query(queryText, queryParams),
+            db.query('SELECT * FROM requests ORDER BY created_at DESC;'),
             db.query('SELECT * FROM users WHERE email = $1', [req.user.email])
         ]);
 
         const userData = userResult.rows[0];
 
-        result.rows = result.rows
-            .filter(request => request.accepted_by === null)
-            .filter(request => request.user_id != userData.user_id)
-            .map(row => ({
-                ...row,
-                delivery_deadline: row.delivery_deadline.toISOString().split('T')[0],
-                proposals: formatProposals(row.proposals),
-                posted_time: calculatePostedTime(row.created_at)
+        let filteredRequests = result.rows.map(row => ({
+            ...row,
+            delivery_deadline: row.delivery_deadline.toISOString().split('T')[0],
+            proposals: formatProposals(row.proposals),
+            posted_time: calculatePostedTime(row.created_at)
+        }));
+
+        if (filterMyDemands) {
+            filteredRequests = filteredRequests.filter(request =>
+                request.user_id === userData.user_id || request.accepted_by === userData.email
+            ).map(request => ({
+                ...request,
+                accepted_status: request.accepted_by 
+                    ? `Accepted by - ${request.accepted_by}` 
+                    : 'Yet to be accepted'
             }));
-        //console.log(result.rows);
+            console.log(filteredRequests);   
+        } else {
+            filteredRequests = filteredRequests
+                .filter(request => request.accepted_by === null)
+                .filter(request => request.user_id != userData.user_id);
+        }
 
         res.render('home', { 
-            requests: result.rows,
+            requests: filteredRequests,
             profileStatus: req.user.profileStatus,
-            user: userData,
-
+            user: userData
         });
     } catch (err) {
         console.error('Error fetching data:', err);
