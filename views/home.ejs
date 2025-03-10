@@ -22,8 +22,8 @@
 
 </head>
 <body>
-
-    <!-- navbar -->
+    
+    
      <!--navbar  -->
     <div class="px-3 py-1 border-bottom" style="background-color: #3d6a25;">
         <div class="container-fluid">
@@ -38,26 +38,26 @@
   
           <ul class="nav col-12 col-lg-auto my-2 mx-auto my-md-0 text-small d-flex justify-content-center">
             <li>
-                <a href="/home" class="nav-link text-white d-flex flex-column align-items-center">
-                  <i class="bi bi-house" style="font-size: 18px;"></i>
+                <a href="/home" class="nav-link text-white d-flex flex-column align-items-center ">
+                  <i class="bi bi-house text-warning " style="font-size: 22px;"></i>
                   Home
                 </a>
               </li>
               <li>
                 <a href="/home" class="nav-link text-white d-flex flex-column align-items-center">
-                  <i class="bi bi-card-text" style="font-size: 18px;"></i>
-                  MyDemands
+                  <i class="bi bi-card-text" style="font-size: 22px;"></i>
+                  Demands
                 </a>
               </li>
               <li>
                 <a href="#" class="nav-link text-white d-flex flex-column align-items-center">
-                  <i class="bi bi-bell" style="font-size: 18px;"></i>
+                  <i class="bi bi-bell" style="font-size: 22px;"></i>
                   Notifications
                 </a>
               </li>
               <li>
                 <a href="#" class="nav-link text-white d-flex flex-column align-items-center">
-                  <i class="bi bi-chat-dots" style="font-size: 18px;"></i>
+                  <i class="bi bi-chat-dots" style="font-size: 22px;"></i>
                   Chat
                 </a>
               </li>
@@ -99,6 +99,22 @@
           </div>
         </div>
     </div>
+<!-- navbar -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <div id="main-body" class="d-flex justify-content-center py-4" style="height: 100vh; margin:0">
         <div class="container-fluid">
@@ -279,10 +295,12 @@
                     
                 </div>
             </div>
+            <div class="row">
+                <%- include('partials/footer') %>
+            </div>
         </div>
     </div>
 
-    <!-- Chatbot Icon -->
 <!-- Chatbot Icon -->
 <div id="chatbot-icon" onclick="toggleChat()" style="
     position: fixed;
@@ -308,6 +326,8 @@
 <div id="chat-window" style="
     position: fixed;
     bottom: 80px;
+    min-width: 500px;
+    min-height: 750px;
     right: 20px;
     width: 360px;
     height: 420px;
@@ -382,6 +402,7 @@
         </button>
     </div>
 </div>
+
 
 <!-- Markdown Converter -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
@@ -613,7 +634,7 @@
     </div>
     
     
-
+    
 
     
     

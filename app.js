@@ -45,6 +45,7 @@ db.connect();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
 const authenticateToken = (req, res, next) => {
     const token = req.cookies.token;
 

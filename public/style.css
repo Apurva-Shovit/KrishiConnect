@@ -1,0 +1,5 @@
+.active {
+    color: orange!important; /* Text color */
+    background-color: transparent; /* Ensure background is not affected */
+    font-weight: bold; /* Optional: Make it stand out */
+}
