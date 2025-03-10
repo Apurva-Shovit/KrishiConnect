@@ -98,60 +98,83 @@
     
 <div class="container">
     <div class="row">
+        <!-- Farmer Profile -->
         <div class="col-md-6">
-            <div class="p-3  shadow bg-light" style="border-radius: 20px;">
+            <div class="p-3 shadow bg-light" style="border-radius: 20px;">
                 <h2 style="text-align: center;">Farmer Profile</h2>
                 <form id="farmerProfileForm" method="POST" action="/submit-farmer-profile">
                     <div class="mb-3">
                         <label for="farmer_location" class="form-label">Location</label>
-                        <input type="text" class="form-control" id="farmer_location" name="location">
+                        <input type="text" class="form-control" id="farmer_location" name="location" 
+                               value="<%= profileData.farmer_profile_completed ? profileData.farmer_profile.location : '' %>">
                     </div>
+                
                     <div class="mb-3">
                         <label for="farmSize" class="form-label">Farm Size (in acres)</label>
-                        <input type="number" class="form-control" id="farmSize" name="farmSize">
+                        <input type="number" class="form-control" id="farmSize" name="farmSize" 
+                               value="<%= profileData.farmer_profile_completed ? profileData.farmer_profile.farmSize : '' %>">
                     </div>
+                
                     <div class="mb-3">
                         <label for="cropsGrown" class="form-label">Crops Grown</label>
-                        <input type="text" class="form-control" id="cropsGrown" name="cropsGrown" placeholder="Wheat,Rice,Bajra">
+                        <input type="text" class="form-control" id="cropsGrown" name="cropsGrown" 
+                               value="<%= profileData.farmer_profile_completed ? profileData.farmer_profile.cropsGrown : '' %>">
                     </div>
+                
                     <div class="mb-3">
                         <label for="experience" class="form-label">Experience (in years)</label>
-                        <input type="number" class="form-control" id="experience" name="experience">
+                        <input type="number" class="form-control" id="experience" name="experience" 
+                               value="<%= profileData.farmer_profile_completed ? profileData.farmer_profile.experience : '' %>">
                     </div>
+                
                     <div class="mb-3">
                         <label for="farmingMethods" class="form-label">Farming Methods</label>
-                        <input type="text" class="form-control" id="farmingMethods" name="farmingMethods" placeholder="organic, fertilizer based">
+                        <input type="text" class="form-control" id="farmingMethods" name="farmingMethods" 
+                               value="<%= profileData.farmer_profile_completed ? profileData.farmer_profile.farmingMethods : '' %>">
                     </div>
-                    <button type="submit" class="btn btn-success w-100" id="submitBtn">Update</button>
-                </form>
+                
+                    <button type="submit" class="btn btn-success w-100">
+                        <%= profileData.farmer_profile_completed ? "Update" : "Submit" %>
+                    </button>                </form>
+                
             </div>
         </div>
+
+        <!-- Buyer Profile -->
         <div class="col-md-6">
             <div class="p-3 shadow bg-light" style="border-radius: 20px;">
                 <h2 style="text-align: center;">Buyer Profile</h2>
                 <form id="buyerProfileForm" method="POST" action="/submit-buyer-profile">
                     <div class="mb-3">
                         <label for="buyer_location" class="form-label">Location</label>
-                        <input type="text" class="form-control" id="buyer_location" name="location" required>
+                        <input type="text" class="form-control" id="buyer_location" name="location" 
+                               value="<%= profileData.buyer_profile_completed ? profileData.buyer_profile.location : '' %>" required>
                     </div>
                     <div class="mb-3">
                         <label for="companyName" class="form-label">Company Name</label>
-                        <input type="text" class="form-control" id="companyName" name="companyName" required>
+                        <input type="text" class="form-control" id="companyName" name="companyName" 
+                               value="<%= profileData.buyer_profile_completed ? profileData.buyer_profile.companyName : '' %>" required>
                     </div>
                     <div class="mb-3">
                         <label for="productsNeeded" class="form-label">Products Needed</label>
-                        <input type="text" class="form-control" id="productsNeeded" name="productsNeeded" placeholder="Wheat, Rice, Bajra" required>
+                        <input type="text" class="form-control" id="productsNeeded" name="productsNeeded" 
+                               value="<%= profileData.buyer_profile_completed ? profileData.buyer_profile.productsNeeded : '' %>" required>
                     </div>
                     <div class="mb-3">
                         <label for="preferredQuantities" class="form-label">Preferred Quantities</label>
-                        <input type="text" class="form-control" id="preferredQuantities" name="preferredQuantities" placeholder="e.g., Bulk Orders, Small Batches" required>
+                        <input type="text" class="form-control" id="preferredQuantities" name="preferredQuantities" 
+                               value="<%= profileData.buyer_profile_completed ? profileData.buyer_profile.preferredQuantities : '' %>" required>
                     </div>
-                    <button type="submit" class="btn btn-success w-100" id="submitBtn1">Submit</button>
-                </form>
+                    <button type="submit" class="btn btn-success w-100">
+                        <%= profileData.buyer_profile_completed ? "Update" : "Submit" %>
+                    </button>               
+                 </form>
             </div>
         </div>
+        
     </div>
 </div>
+
 
 
 

@@ -111,6 +111,29 @@ app.get("/register", (req, res) => {
 app.get("/about", (req, res) => {
     res.render("about.ejs", {errorMessage : null});
 });
+ // Import database connection
+
+app.get("/profile", authenticateToken, async (req, res) => {
+    try {
+        // Fetch the farmer profile
+        const user_id = req.user.user_id;
+        const userData = await db.query(
+            "SELECT * FROM users WHERE user_id = $1",[user_id]
+        );
+
+
+        // Prepare the data for EJS rendering
+        
+        
+        // Render profile page
+        console.log(userData.rows[0]);
+        res.render("profile", { profileData: userData.rows[0] });
+    } catch (err) {
+        console.error("Error fetching user profiles:", err);
+        res.status(500).send("Server Error");
+    }
+});
+
 
 app.get("/postdemandpage", authenticateToken, (req, res) => {
     try {
@@ -120,6 +143,7 @@ app.get("/postdemandpage", authenticateToken, (req, res) => {
         res.status(500).send("Server Error");
     }
 });
+
 
 
 
