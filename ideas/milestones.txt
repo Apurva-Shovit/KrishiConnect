@@ -1,0 +1,32 @@
+milestones:
+1.landing page
+2.login/signup
+3.home page - https://www.upwork.com/nx/find-work/best-matches
+ description -  post request 
+		accept requests
+		purchaser can see all applicants
+review 1 - home page UI only
+
+
+
+6.AI chat bot
+
+
+review 2- complete backend linkage for home page
+
+
+4.farmer profile
+5.purchaser profile
+7.chat section for farmer and purchaser 
+
+review 3 - chat section 40-50%
+
+8.recommending demands that match the profile
+9.verify progress -- major task -- add admin role
+
+review 4 sab complete karna hai
+
+
+
+
+

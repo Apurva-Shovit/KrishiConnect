@@ -1,0 +1,22 @@
+{
+  "name": "krishiconnect",
+  "version": "1.0.0",
+  "description": "KrishiConnect connects small-scale farmers with buyers, offering a secure platform for crop trading. Buyers post requests with milestones, ensuring staged payments tied to crop growth. Farmers choose suitable requests, with verified profiles ensuring trust. Features like chat, milestone tracking,, reducing losses and boosting farmer stability",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev" : "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Apurva-Shovit/KrishiConnect.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Apurva-Shovit/KrishiConnect/issues"
+  },
+  "homepage": "https://github.com/Apurva-Shovit/KrishiConnect#readme"
+}

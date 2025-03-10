@@ -1,0 +1,25 @@
+ossome hackathon
+
+3. Digital Supply Chain & E-Commerce for Farmers
+Problem: Farmers rely on middlemen and have limited direct access to buyers.
+Software Solution: A digital marketplace platform can directly connect farmers with buyers, restaurants, and consumers, reducing middlemen dependency and increasing profits.
+
+12. Digital Land Leasing & Rental Platform
+Problem: Farmers struggle to find available land for short-term leasing.
+Software Solution: A digital platform where landowners can list available land, and farmers can lease it for specific periods.
+
+.///./18. Farmworker Recruitment & Management System
+Problem: Farmers struggle to hire and manage seasonal labor efficiently.
+Software Solution: A digital platform that connects farmers with available farm workers and tracks their work hours and payments.///./
+
+21. Virtual Farm Tourism & Direct Sales Platform
+Problem: Farmers want to connect directly with consumers but have no platform.
+Software Solution: A digital marketplace where consumers can buy fresh produce directly from farmers, along with options for farm visits.
+
+
+Farm to consume E-commerce platform with ai based fair pricing.
+
+
+MSP protests:
+Farmers often organize large-scale protests demanding a guaranteed Minimum Support Price for their crops, which would provide them with a stable income. 
+

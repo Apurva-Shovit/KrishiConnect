@@ -1,0 +1,24 @@
+a car pooling like app where people can see, if other farmers are taking goods from nearby them and ask for pooling of goods which would reduce the transportation cost.
+
+problem:
+Lack of storage facilities in rural areas has been a limiting factor for post-harvest losses. Nearly 16% of fruits and vegetables, 10% of oilseeds, 9% of pulses, and 6% of cereals produced are being wasted every year due to lack of storage facilities.
+
+solutions:
+a website that allows storage facilities to list their services online and allows farmers to book storage in advance. something similar to hotel booking sites where people can pre-book and pay for the storage.
+
+this will also solve the problem of selling the products at a lower price. as they will be able to store the stock and sell at their will according to the market price.
+
+this will make it so that the farmers eliminate middleman, who store the produce after the harvest bought on lower prices and sell them when the prices rise.
+
+
+problem: The major problems persistent with crop insurance schemes faced by farmers include lack of proper awareness of insurance schemes, evaluation of extend of damages caused due to crop losses, inadequate coverage of insurance schemes and non-payment / delayed settlement of claims.
+
+solutions: a website that aggregates all of the available insurance schemes available and allow farmers to take expert opinion of said insurance schemes.
+
+Q - how do you gather the information about the said insurance schemes?
+
+problem: 9. Price volatility:
+
+Price volatility can have a significant impact on the livelihoods of farmers, especially small farmers who are more vulnerable to market fluctuations. Price volatility can lead to income instability for farmers as sudden drops in prices can reduce their income and profits. This can make it difficult for farmers to plan and invest in their farms, leading to a vicious cycle of poverty and low productivity. This situation creates uncertainty for farmers as they are not sure of the prices they will receive for their produce in the future. This makes it difficult for farmers to make informed decisions about what crops to grow, how much to produce, and when to sell their produce.
+
+solution- DEMAND FARMING- a website that allows big player to set a price for a crop, set dates for the said harvest delivery and request small farmers to produce the said crops, allocating funds at set interval after seeing the progress.
