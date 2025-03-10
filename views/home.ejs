@@ -44,7 +44,7 @@
                 </a>
               </li>
               <li>
-                <a href="/myDemands" class="nav-link text-white d-flex flex-column align-items-center">
+                    <a href="/myDemands" class="nav-link text-white d-flex flex-column align-items-center">
                   <i class="bi bi-card-text" style="font-size: 22px;"></i>
                   MyDemands
                 </a>
@@ -536,41 +536,75 @@
     </script>
    
 
-    <div class="modal fade" id="farmerProfileModal" tabindex="-1" aria-labelledby="farmerProfileModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="farmerProfileModalLabel">Farmer Profile Form</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="farmerProfileForm" method="POST" action="/submit-farmer-profile">
-                        <div class="mb-3">
-                            <label for="farmer_location" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="farmer_location" name="location" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="farmSize" class="form-label">Farm Size (in acres)</label>
-                            <input type="number" class="form-control" id="farmSize" name="farmSize" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="cropsGrown" class="form-label">Crops Grown</label>
-                            <input type="text" class="form-control" id="cropsGrown" name="cropsGrown" placeholder="Wheat,Rice,Bajra" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="experience" class="form-label">Experience (in years)</label>
-                            <input type="number" class="form-control" id="experience" name="experience" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="farmingMethods" class="form-label">Farming Methods</label>
-                            <input type="text" class="form-control" id="farmingMethods" name="farmingMethods" placeholder="organic, fertilizer based" required>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">Submit</button>
-                    </form>
-                </div>
+   <div class="modal fade" id="farmerProfileModal" tabindex="-1" aria-labelledby="farmerProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="farmerProfileModalLabel">Farmer Profile Form</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="farmerProfileForm" method="POST" action="/submit-farmer-profile">
+                    <div class="mb-3">
+                        <label for="farmer_location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="farmer_location" name="location">
+                    </div>
+                    <div class="mb-3">
+                        <label for="farmSize" class="form-label">Farm Size (in acres)</label>
+                        <input type="number" class="form-control" id="farmSize" name="farmSize">
+                    </div>
+                    <div class="mb-3">
+                        <label for="cropsGrown" class="form-label">Crops Grown</label>
+                        <input type="text" class="form-control" id="cropsGrown" name="cropsGrown" placeholder="Wheat,Rice,Bajra">
+                    </div>
+                    <div class="mb-3">
+                        <label for="experience" class="form-label">Experience (in years)</label>
+                        <input type="number" class="form-control" id="experience" name="experience">
+                    </div>
+                    <div class="mb-3">
+                        <label for="farmingMethods" class="form-label">Farming Methods</label>
+                        <input type="text" class="form-control" id="farmingMethods" name="farmingMethods" placeholder="organic, fertilizer based">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100" id="submitBtn">Submit</button>
+                </form>
             </div>
         </div>
     </div>
+    </div>
+
+    <script>
+        async function loadFarmerProfile(userId) {
+            try {
+                const response = await fetch(`/get-farmer-profile?user_id=${userId}`);
+                const data = await response.json();
+
+                if (data.farmer_profile_completed) {
+                    const profile = data.farmer_profile || {};
+                    document.getElementById('farmer_location').value = profile.location || '';
+                    document.getElementById('farmSize').value = profile.farmSize || '';
+                    document.getElementById('cropsGrown').value = profile.cropsGrown || '';
+                    document.getElementById('experience').value = profile.experience || '';
+                    document.getElementById('farmingMethods').value = profile.farmingMethods || '';
+
+                    document.querySelectorAll('#farmerProfileForm input').forEach(input => {
+                        input.setAttribute('disabled', 'true');
+                    });
+
+                    document.getElementById('submitBtn').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading farmer profile:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = '<%= user.user_id %>';
+            if (userId) {
+                loadFarmerProfile(userId);
+            }
+        });
+    </script>
+
 
     <div class="modal fade" id="buyerProfileModal" tabindex="-1" aria-labelledby="buyerProfileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -597,13 +631,46 @@
                             <label for="preferredQuantities" class="form-label">Preferred Quantities</label>
                             <input type="text" class="form-control" id="preferredQuantities" name="preferredQuantities" placeholder="e.g., Bulk Orders, Small Batches" required>
                         </div>
-                        <button type="submit" class="btn btn-success w-100">Submit</button>
+                        <button type="submit" class="btn btn-success w-100" id="submitBtn1">Submit</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-   
+    <script>
+        async function loadBuyerProfile(userId) {
+            try {
+                const response = await fetch(`/get-buyer-profile?user_id=${userId}`);
+                const data = await response.json();
+    
+                if (data.buyer_profile_completed) {
+                    const profile = data.buyer_profile || {};
+                    document.getElementById('buyer_location').value = profile.location || '';
+                    document.getElementById('companyName').value = profile.companyName || '';
+                    document.getElementById('productsNeeded').value = profile.productsNeeded || '';
+                    document.getElementById('preferredQuantities').value = profile.preferredQuantities || '';
+    
+                    document.querySelectorAll('#buyerProfileForm input').forEach(input => {
+                        input.setAttribute('disabled', 'true');
+                    });
+    
+                    document.getElementById('submitBtn1').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading buyer profile:', error);
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = '<%= user.user_id %>';
+            if (userId) {
+                loadBuyerProfile(userId);
+            }
+        });
+    </script>
+    
+    
+
     <div class="modal fade" id="requestDetailsModal" tabindex="-1" aria-labelledby="requestDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
