@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        #chatList {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            transition: background 0.3s;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+        .chat-item:hover {
+            background: #e6f7ff;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #007bff;
+            color: #fff;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .chat-info {
+            flex-grow: 1;
+        }
+        .chat-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .chat-status {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h2>Chat List</h2>
+    <div id="chatList">
+        <% if (!chats || chats.length === 0) { %>
+            <p style="text-align: center; color: #666;">No active chats found.</p>
+        <% } else { %>
+            <% chats.forEach(chat => { %>
+                <div class="chat-item" onclick="openChat('<%= chat.request_id %>', '<%= chat.user_id %>')">
+                    <div class="avatar">
+                        <%= chat.name ? chat.name.charAt(0).toUpperCase() : '?' %>
+                    </div>
+                    <div class="chat-info">
+                        <p class="chat-name"><%= chat.name ? chat.name : 'Unknown User' %></p>
+                        <p class="chat-status">Tap to open chat</p>
+                    </div>
+                </div>
+            <% }); %>
+        <% } %>
+    </div>
+
+    <script>
+        function openChat(requestId, receiverId) {
+            // if (!requestId || !receiverId) {
+            //     console.error("Missing requestId or receiverId", { requestId, receiverId });
+            //     alert("Error: Missing chat details.");
+            //     return;
+            // }
+            window.location.href = `/chat?requestId=${encodeURIComponent(requestId)}&receiverId=${encodeURIComponent(receiverId)}`;
+        }
+
+    </script>
+</body>
+</html>

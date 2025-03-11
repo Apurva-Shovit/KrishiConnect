@@ -429,11 +429,43 @@ app.post('/home/AcceptRequest', authenticateToken, async (req, res) => {
     try {
         const userEmail = req.user.email;
 
+        // Get user_id of the one accepting the request
+        const accepterQuery = `SELECT user_id FROM users WHERE email = $1`;
+        const accepterResult = await db.query(accepterQuery, [userEmail]);
+
+        if (accepterResult.rows.length === 0) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        const accepterId = accepterResult.rows[0].user_id;
+
+        // Get user_id of the original request creator
+        const requestQuery = `SELECT user_id FROM requests WHERE request_id = $1`;
+        const requestResult = await db.query(requestQuery, [request_id]);
+
+        if (requestResult.rows.length === 0) {
+            return res.status(404).json({ error: "Request not found." });
+        }
+
+        const requestCreatorId = requestResult.rows[0].user_id;
+
+        if (requestCreatorId === accepterId) {
+            return res.status(400).json({ error: "You cannot accept your own request." });
+        }
+
+        // Update request status
         await db.query(
             `UPDATE requests 
-             SET accepted_by = $1 
+             SET accepted_by = $1, status = 'accepted' 
              WHERE request_id = $2`,
             [userEmail, request_id]
+        );
+
+        // Insert an empty chat entry to allow communication
+        await db.query(
+            `INSERT INTO chats (request_id, sender_id, receiver_id, message) 
+             VALUES ($1, $2, $3, '')`,
+            [request_id, requestCreatorId, accepterId]
         );
 
         res.redirect('/home');
@@ -444,7 +476,92 @@ app.post('/home/AcceptRequest', authenticateToken, async (req, res) => {
 });
 
 
+app.get('/chat_list/:userId', authenticateToken, async (req, res) => {
+    const userId = req.params.userId;  
+    console.log("User ID:", userId);
 
+    try {
+        const query = `
+            SELECT 
+                r.request_id, r.crop_name, 
+                u1.name AS farmer_name, u1.user_id AS farmer_id,
+                u2.name AS buyer_name, u2.user_id AS buyer_id
+            FROM requests r
+            JOIN users u1 ON u1.user_id = r.user_id  -- Farmer (request creator)
+            JOIN users u2 ON u2.user_id = (SELECT user_id FROM users WHERE email = r.accepted_by)  -- Buyer (who accepted)
+            WHERE r.status = 'accepted' 
+              AND ($1 = u1.user_id OR $1 = u2.user_id)  -- Only involved users can see
+        `;
+
+        const { rows } = await db.query(query, [userId]);
+
+        if (rows.length === 0) {
+            return res.render("chat_list.ejs", { chats: [] });
+        }
+
+        res.render("chat_list.ejs", { chats: rows });
+    } catch (error) {
+        console.error("Error fetching chat list:", error);
+        res.status(500).send("Server error");
+    }
+});
+
+
+
+
+
+app.get('/chat', authenticateToken, async (req, res) => {
+    try {
+        const { requestId } = req.query;  
+        const senderId = req.user?.user_id;  // User making the request
+
+        if (!requestId || !senderId) {
+            return res.status(400).send("Missing chat details.");
+        }
+
+        console.log("Fetching chat for Request ID:", requestId);
+        console.log("Sender ID:", senderId);
+
+        // Fetch chat details, including the receiver ID
+        const chatInfo = await db.query(
+            `SELECT DISTINCT sender_id, receiver_id 
+             FROM chats 
+             WHERE request_id = $1 
+             LIMIT 1`,
+            [requestId]
+        );
+
+        if (chatInfo.rows.length === 0) {
+            return res.status(404).send("Chat not found.");
+        }
+
+        // Determine receiverId (not the current user)
+        const { sender_id, receiver_id } = chatInfo.rows[0];
+        const chatPartnerId = sender_id === senderId ? receiver_id : sender_id;
+
+        console.log("Receiver ID:", chatPartnerId);
+
+        // Fetch chat messages
+        const { rows: chatMessages } = await db.query(
+            `SELECT sender_id, message, timestamp 
+             FROM chats 
+             WHERE request_id = $1 
+             ORDER BY timestamp ASC`,
+            [requestId]
+        );
+
+        res.render("chat.ejs", {
+            user: req.user,
+            requestId,
+            receiverId: chatPartnerId,  // Receiver is fetched dynamically
+            senderId,
+            messages: chatMessages || []
+        });
+    } catch (error) {
+        console.error("Error fetching chat messages:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
