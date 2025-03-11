@@ -98,7 +98,7 @@
     </div>
 </div>
     
-  <main class="form-signin w-100 mx-auto" style="max-width: 1000px;margin-top: 120px;">
+  <main class="form-signin w-100 mx-auto" style="max-width: 1200px;margin-top: 40px;">
     <div class="row g-5" style="width: 100%;">
       <div style="width: 100%;">
 
@@ -108,102 +108,110 @@
         <form class="needs-validation" action="/postdemand" method="POST" >
           <div class="row g-3">
               <!-- First Row: Crop Name, Quantity, Price, Delivery Deadline -->
-              <div class="col-md-2">
-                  <label for="cropName" class="form-label">Crop Name</label>
-                  <input type="text" class="form-control" id="cropName" name="crop_name" placeholder="E.g., Wheat, Rice" required>
-                  <div class="invalid-feedback">Enter the crop name.</div>
+              <div class="node-entry border p-3 mt-2 rounded border-dark">
+                <div class="row">
+                    
+                </div>
+            
+                <div class="row g-3">
+                    <!-- Crop Name -->
+                    <div class="col-md-2">
+                        <label for="cropName" class="form-label">Crop Name</label>
+                        <input type="text" class="form-control" id="cropName" name="crop_name" placeholder="E.g., Wheat, Rice" required>
+                        <div class="invalid-feedback">Enter the crop name.</div>
+                    </div>
+            
+                    <!-- Quantity -->
+                    <div class="col-md-2">
+                        <label for="quantity" class="form-label">Quantity (kg)</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Quantity in kg" required>
+                        <div class="invalid-feedback">Enter a valid quantity.</div>
+                    </div>
+            
+                    <!-- Price Offered -->
+                    <div class="col-md-2">
+                        <label for="priceOffered" class="form-label">Price Offered</label>
+                        <input type="number" class="form-control" id="priceOffered" name="price_offered" placeholder="Price per kg" step="0.01" required>
+                        <div class="invalid-feedback">Enter a valid price.</div>
+                    </div>
+            
+                    <!-- Delivery Deadline -->
+                    <div class="col-md-2">
+                        <label for="deliveryDeadline" class="form-label">Delivery Deadline</label>
+                        <input type="date" class="form-control" id="deliveryDeadline" name="delivery_deadline" required>
+                        <div class="invalid-feedback">Select a delivery deadline.</div>
+                    </div>
+            
+                    <!-- Category -->
+                    <div class="col-md-2">
+                        <label for="status" class="form-label">Category</label>
+                        <select class="form-control" id="status" name="spendingcategory" required>
+                            <option value="Essential" selected>Essential</option>
+                            <option value="Bulk">Bulk</option>
+                            <option value="Luxury">Luxury</option>
+                        </select>
+                        <div class="invalid-feedback">Select a category.</div>
+                    </div>
+            
+                    <!-- Location -->
+                    <div class="col-md-2">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" placeholder="City, State">
+                    </div>
+                </div>
+            
+                <!-- Description -->
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" placeholder="Provide detailed information about the demand" rows="3" required></textarea>
+                        <div class="invalid-feedback">Enter a valid description.</div>
+                    </div>
+                </div>
+            
+                <!-- Project Timeline -->
+                
+            </div>
+            
+      
+            <div class="row mt-4">
+              <div class="col-md-12 text-center">
+                  <h4>Project Timeline</h4>
               </div>
-      
-              <div class="col-md-2">
-                  <label for="quantity" class="form-label">Quantity (kg)</label>
-                  <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Enter quantity in kg" required>
-                  <div class="invalid-feedback">Enter a valid quantity.</div>
-              </div>
-      
-              <div class="col-md-2">
-                  <label for="priceOffered" class="form-label">Price Offered</label>
-                  <input type="number" class="form-control" id="priceOffered" name="price_offered" placeholder="Enter price per kg" step="0.01" required>
-                  <div class="invalid-feedback">Enter a valid price.</div>
-              </div>
-      
-              <div class="col-md-2">
-                  <label for="deliveryDeadline" class="form-label">Delivery Deadline</label>
-                  <input type="date" class="form-control" id="deliveryDeadline" name="delivery_deadline" required>
-                  <div class="invalid-feedback">Select a delivery deadline.</div>
-              </div>
-      
-              <!-- Second Row: Category, Location -->
-              <div class="col-md-2">
-                  <label for="status" class="form-label">Category</label>
-                  <select class="form-control" id="status" name="spendingcategory" required>
-                      <option value="Essential" selected>Essential</option>
-                      <option value="Bulk">Bulk</option>
-                      <option value="Luxury">Luxury</option>
-                  </select>
-                  <div class="invalid-feedback">Select a category.</div>
-              </div>
-      
-              <div class="col-md-2">
-                  <label for="location" class="form-label">Location</label>
-                  <input type="text" class="form-control" id="location" name="location" placeholder="City, State">
-              </div>
-      
-              <!-- Description (Long) -->
-              <div class="col-md-12">
-                  <label for="description" class="form-label">Description</label>
-                  <textarea class="form-control" id="description" name="description" placeholder="Provide detailed information about the demand" rows="4" required></textarea>
-                  <div class="invalid-feedback">Enter a valid description.</div>
-              </div>
-      
-              <!-- Timeline Section -->
-              <div class="col-md-12 mt-4">
-                  <h4 class="text-center">Project Timeline</h4>
-              </div>
-      
-              <!-- Start Date & End Date
-              <div class="col-md-6">
-                  <label for="startDate" class="form-label">Start Date</label>
-                  <input type="date" class="form-control" id="startDate" name="start_date" required>
-                  <div class="invalid-feedback">Select a start date.</div>
-              </div> -->
-      
-              <!-- <div class="col-md-6">
-                  <label for="endDate" class="form-label">End Date</label>
-                  <input type="date" class="form-control" id="endDate" name="end_date" required>
-                  <div class="invalid-feedback">Select an end date.</div>
-              </div> -->
+          </div>
+          <hr>
       
               <!-- Timeline Nodes -->
-              <div class="col-md-3">
-                  <label class="form-label">Project Stages</label>
-                  <div class="node-entry border p-3 mt-2 rounded">
-                    <label class="form-label">Stage 1</label>
-                    <input type="text" class="form-control mb-2" name="node_title1" placeholder="Stage Title" required>
+              <div class="col-md-3 text-center">
+                  
+                  <div class="node-entry border p-3 mt-2 rounded border-dark">
+                    <label class="form-label border-dark">Stage 1</label>
+                    <input type="text" class="form-control mb-2 " name="node_title1" placeholder="Stage Title" required>
                     <input type="date" class="form-control mb-2" name="node_date1" required>
                     <textarea class="form-control mb-2" name="node_description1" placeholder="Stage Description" rows="2" required></textarea>
                 </div>
               </div>
-              <div class="col-md-3">
-                <label class="form-label">Project Stages</label>
-                <div class="node-entry border p-3 mt-2 rounded">
+              <div class="col-md-3 text-center">
+                
+                <div class="node-entry border p-3 mt-2 rounded border-dark">
                   <label class="form-label">Stage 2</label>
                   <input type="text" class="form-control mb-2" name="node_title2" placeholder="Stage Title" required>
                   <input type="date" class="form-control mb-2" name="node_date2" required>
                   <textarea class="form-control mb-2" name="node_description2" placeholder="Stage Description" rows="2" required></textarea>
               </div>
             </div>
-            <div class="col-md-3">
-              <label class="form-label">Project Stages</label>
-              <div class="node-entry border p-3 mt-2 rounded">
+            <div class="col-md-3 text-center">
+              
+              <div class="node-entry border p-3 mt-2 rounded border-dark">
                 <label class="form-label">Stage 3</label>
                 <input type="text" class="form-control mb-2" name="node_title3" placeholder="Stage Title" required>
                 <input type="date" class="form-control mb-2" name="node_date3" required>
                 <textarea class="form-control mb-2" name="node_description3" placeholder="Stage Description" rows="2" required></textarea>
             </div>
           </div>
-          <div class="col-md-3">
-            <label class="form-label">Project Stages</label>
-            <div class="node-entry border p-3 mt-2 rounded">
+          <div class="col-md-3 text-center  ">
+            
+            <div class="node-entry border p-3 mt-2 rounded border-dark">
               <label class="form-label">Stage 4</label>
               <input type="text" class="form-control mb-2" name="node_title4" placeholder="Stage Title" required>
               <input type="date" class="form-control mb-2" name="node_date4" required>
