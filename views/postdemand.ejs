@@ -87,12 +87,8 @@
                 <li><a class="dropdown-item" href="/home/logout">Sign out</a></li>
             </ul>
         </div>
-        
           </div>
-                
-          
         </ul>
-        
       </div>
     </div>
 </div>
@@ -216,10 +212,6 @@
               </div>
           </div>
       </form>
-      
-      
-        
-        
       </div>
     </div>
   </main>
@@ -252,8 +244,6 @@
       </ul>
     </div>
   </footer>
-
-
   <script>
   document.getElementById("addNode").addEventListener("click", function() {
     const container = document.getElementById("nodesContainer");
@@ -282,10 +272,6 @@
 </script>
 
 <script>
-
-
-
-
   function openRequestDetails(name, location, company, crop, quantity, offerPrice, totalAmount, requestId) {
       document.getElementById('buyerName').innerText = name || 'working on it...';
       document.getElementById('buyerLocation').innerText = location || 'working on it...';
@@ -302,8 +288,6 @@
       try {
           const response = await fetch(`/home/request?request_id=${requestId}`);
           const data = await response.json();
-
-
           openRequestDetails(
               data.buyer_name,
               data.buyer_location,
@@ -318,10 +302,7 @@
           console.error('Error fetching request details:', error);
       }
   }
-
-
 </script>
-
 
 <div class="modal fade" id="farmerProfileModal" tabindex="-1" aria-labelledby="farmerProfileModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -392,7 +373,6 @@
       });
   </script>
 
-
   <div class="modal fade" id="buyerProfileModal" tabindex="-1" aria-labelledby="buyerProfileModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
@@ -456,8 +436,6 @@
       });
   </script>
 
-
-
 <div class="modal fade" id="requestDetailsModal" tabindex="-1" aria-labelledby="requestDetailsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -494,10 +472,5 @@
       </div>
   </div>
 </div>
-
-
 </body>
-
-
-
 </html>

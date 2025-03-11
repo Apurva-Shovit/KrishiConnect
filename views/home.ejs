@@ -23,7 +23,6 @@
 </head>
 <body>
     
-    
      <!--navbar  -->
     <div class="px-3 py-1 border-bottom" style="background-color: #3d6a25;">
         <div class="container-fluid">
@@ -59,11 +58,16 @@
                 </a>
               </li>
               <li>
-                <a href="#" class="nav-link text-white d-flex flex-column align-items-center">
-                  <i class="bi bi-chat-dots" style="font-size: 22px;"></i>
-                  Chat
+                <a id="chatLink" href="#" class="nav-link text-white d-flex flex-column align-items-center">
+                    <i class="bi bi-chat-dots" style="font-size: 22px;"></i>
+                    Chat
                 </a>
-              </li>
+            </li>
+            <script>
+                
+               
+            </script>
+            
             </ul>
             <ul class="nav col-12 col-lg-auto my-2 ms-auto my-md-0 text-small d-flex justify-content-end">
               <div class="d-flex align-items-center">
@@ -112,21 +116,6 @@
         </div>
     </div>
 <!-- navbar -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <div id="main-body" class="d-flex justify-content-center py-4" style="height: 100vh; margin:0">
         <div class="container-fluid">
@@ -243,16 +232,7 @@
                     <% } else { %>
                         <p>No matching results found.</p>
                     <% } %>
-                    
-                    
-                    
-                    
-                    
-                            
-
-                    
                 </div>
-
 
                 <div class="col-md-3" style="width:25%;">
                     <% if (profileStatus === 'incomplete') { %>
@@ -319,9 +299,6 @@
                             </div>
                         <% } %>
                     <% } %>
-                    
-                    
-                    
                 </div>
             </div>
             <div class="row">
@@ -432,13 +409,15 @@
         </div>
     </div>
 
-
 <!-- Markdown Converter -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
 
     <script>
-
-
+        window.currentUser = {
+            userId : "<%= user.user_id %>"
+        }
+        let dynamicValue = `/chat_list/${window.currentUser.userId}`;
+        document.getElementById("chatLink").href = `${dynamicValue}`;
         window.onload = function () {
             const urlParams = new URLSearchParams(window.location.search);
             const filter = urlParams.get('filter');
@@ -548,7 +527,6 @@
             }
     </script>
 
-
     <script>
     function vote(icon, type) {
         const parentDiv = icon.parentElement;
@@ -612,9 +590,6 @@
         }
     }
 </script>
-
-
-   
 
    <div class="modal fade" id="farmerProfileModal" tabindex="-1" aria-labelledby="farmerProfileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -685,7 +660,6 @@
         });
     </script>
 
-
     <div class="modal fade" id="buyerProfileModal" tabindex="-1" aria-labelledby="buyerProfileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -749,8 +723,6 @@
         });
     </script>
     
-    
-
     <div class="modal fade" id="requestDetailsModal" tabindex="-1" aria-labelledby="requestDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -796,11 +768,6 @@
             </div>
         </div>
     </div>
-    
-    
-    
-
-    
     
 </body>
 </html>
