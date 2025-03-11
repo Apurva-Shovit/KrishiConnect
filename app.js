@@ -560,20 +560,22 @@ app.get('/chat_list/:userId', authenticateToken, async (req, res) => {
         const query = `
             SELECT 
                 r.request_id, r.crop_name, 
-                u1.name AS farmer_name, u1.user_id AS farmer_id,
-                u2.name AS buyer_name, u2.user_id AS buyer_id
+                CASE 
+                    WHEN u1.user_id = $1 THEN u2.name 
+                    ELSE u1.name 
+                END AS chat_partner_name,
+                CASE 
+                    WHEN u1.user_id = $1 THEN u2.user_id 
+                    ELSE u1.user_id 
+                END AS chat_partner_id
             FROM requests r
             JOIN users u1 ON u1.user_id = r.user_id  -- Farmer (request creator)
-            JOIN users u2 ON u2.user_id = (SELECT user_id FROM users WHERE email = r.accepted_by)  -- Buyer (who accepted)
+            JOIN users u2 ON u2.email = r.accepted_by  -- Buyer (who accepted)
             WHERE r.status = 'accepted' 
               AND ($1 = u1.user_id OR $1 = u2.user_id)  -- Only involved users can see
         `;
 
         const { rows } = await db.query(query, [userId]);
-
-        if (rows.length === 0) {
-            return res.render("chat_list.ejs", { chats: [] });
-        }
 
         res.render("chat_list.ejs", { chats: rows });
     } catch (error) {
@@ -594,7 +596,7 @@ app.get('/chat', authenticateToken, async (req, res) => {
         console.log("Fetching chat for Request ID:", requestId);
         console.log("Sender ID:", senderId);
 
-        // Fetch chat details, including the receiver ID
+        // Fetch chat details to determine the chat partner
         const chatInfo = await db.query(
             `SELECT DISTINCT sender_id, receiver_id 
              FROM chats 
@@ -613,6 +615,18 @@ app.get('/chat', authenticateToken, async (req, res) => {
 
         console.log("Receiver ID:", chatPartnerId);
 
+        // Fetch chat partner’s name
+        const chatPartnerData = await db.query(
+            `SELECT name FROM users WHERE user_id = $1`,
+            [chatPartnerId]
+        );
+
+        const chatPartnerName = chatPartnerData.rows.length > 0 
+            ? chatPartnerData.rows[0].name 
+            : "Unknown User";
+
+        console.log("Chat Partner Name:", chatPartnerName);
+
         // Fetch chat messages
         const { rows: chatMessages } = await db.query(
             `SELECT sender_id, message, timestamp 
@@ -625,7 +639,8 @@ app.get('/chat', authenticateToken, async (req, res) => {
         res.render("chat.ejs", {
             user: req.user,
             requestId,
-            receiverId: chatPartnerId,  // Receiver is fetched dynamically
+            receiverId: chatPartnerId,
+            receiverName: chatPartnerName,  // Pass the name to EJS
             senderId,
             messages: chatMessages || []
         });
