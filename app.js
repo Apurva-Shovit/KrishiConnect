@@ -148,7 +148,7 @@ app.get("/postdemandpage", authenticateToken, (req, res) => {
 
 
 app.post("/postdemand", authenticateToken, async (req, res) => {
-    try {
+    try { 
         const {
             crop_name,
             quantity,
@@ -158,10 +158,11 @@ app.post("/postdemand", authenticateToken, async (req, res) => {
             spendingcatagoory,
             location
         } = req.body;
-
+        const result = await db.query(`SELECT BUYER_PROFILE FROM USERS WHERE USER_ID = ${req.user.user_id}`);
+        const rating = result.rows[0].buyer_profile.rating;
         const query = `
-            INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location, total_amount, user_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;
+            INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location, total_amount, user_id, rating)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *;
         `;
 
         const values = [
@@ -173,8 +174,11 @@ app.post("/postdemand", authenticateToken, async (req, res) => {
             spendingcatagoory,
             location,
             price_offered * quantity,
-            req.user.user_id 
+            req.user.user_id ,
+            rating
         ];
+
+        console.log(values);
 
         await db.query(query, values);
         res.redirect("/home");
