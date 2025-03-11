@@ -194,20 +194,24 @@
                                         <div>
                                             <i class="bi bi-check-circle-fill" style="margin-right: 4px;"></i>
                                             <%= request.payment_verified ? 'Payment Verified' : 'Payment Pending' %>
-                                            <span style="margin: 0 8px;">⭐ ⭐ ⭐ ⭐ <%= request.rating %></span>
+                                            <span style="margin: 0 8px;">
+                                                <% for (let i = 1; i <= 5; i++) { %>
+                                                    <%= i <= request.rating ? '⭐' : '☆' %>
+                                                <% } %>
+                                            </span>
                                             <i class="bi bi-geo-alt" style="margin-left: 12px; margin-right: 4px;"></i>
                                             <%= request.location %>
                                             <span style="margin-left: 12px;">Proposals: <%= request.proposals %></span>
                                         </div>
                     
                                         <% if (request.user_id === user.user_id) { %>
-                                            <button class="btn btn-primary" disabled> 
+                                            <button class="btn btn-primary"  style="max-width:fit-content;" disabled> 
                                                 <%= request.accepted_by 
                                                     ? `Accepted by ${request.accepted_by}` 
                                                     : 'Yet to be Accepted' %>
                                             </button>
                                         <% } else if (request.accepted_by === user.email) { %>
-                                            <button class="btn btn-warning" disabled>
+                                            <button class="btn btn-warning" style="max-width:fit-content;" disabled>
                                                 Accepted by You
                                             </button>
                                         <% } else { %>
