@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import cookieParser from "cookie-parser"; 
 import path from "path";
 import { fileURLToPath } from 'url';
@@ -7,6 +7,9 @@ import pg from "pg";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import axios from 'axios';
+import haversine from 'haversine-distance';
+
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -24,6 +27,20 @@ const db = new pg.Client({
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
 });
+function calculateDistance(loc1, loc2) {
+    const [lat1, lon1] = loc1.split(',').map(Number);
+    const [lat2, lon2] = loc2.split(',').map(Number);
+    return (haversine({ latitude: lat1, longitude: lon1 }, { latitude: lat2, longitude: lon2 }) / 1000).toFixed(2);
+}
+async function getLocation(ip) {
+    try {
+        const response = await axios.get(`https://ipinfo.io/${ip}/json`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching location data:', error.message);
+        return null;
+    }
+}
 
 
 
@@ -46,7 +63,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token) {
@@ -59,6 +76,9 @@ const authenticateToken = (req, res, next) => {
         }
 
         try {
+            const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            const clientIp = userIp === '::1' ? '103.4.222.252' : userIp.split(',')[0].trim();
+            const locationData = await getLocation(clientIp);
             const email = user.email;
 
             const result = await db.query(
@@ -79,7 +99,8 @@ const authenticateToken = (req, res, next) => {
             if(!dbUser.farmer_profile_completed && !dbUser.buyer_profile_completed) profileStatusStr='incomplete';
             req.user = {
                 ...dbUser,
-                profileStatus:profileStatusStr
+                profileStatus:profileStatusStr,
+                location : locationData
             };
 
             next();
@@ -97,6 +118,8 @@ function formatProposals(proposals) {
 }
 
 app.set('view engine', 'ejs');
+app.set('trust proxy', true);
+
 
 // routessss 
 app.get("/", (req, res) => {
@@ -126,7 +149,7 @@ app.get("/profile", authenticateToken, async (req, res) => {
         
         
         // Render profile page
-        console.log(userData.rows[0]);
+       // console.log(userData.rows[0]);
         res.render("profile", { profileData: userData.rows[0] });
     } catch (err) {
         console.error("Error fetching user profiles:", err);
@@ -158,7 +181,7 @@ app.post("/postdemand", authenticateToken, async (req, res) => {
             spendingcategory,
             location,
         } = req.body;
-
+        const loc = req.user.location.loc;
         // Extract timeline stage data dynamically
         let node_titles = [];
         let node_dates = [];
@@ -175,8 +198,8 @@ app.post("/postdemand", authenticateToken, async (req, res) => {
 
         // Insert into requests table
         const requestQuery = `
-            INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location, total_amount, user_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING request_id;
+            INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location, total_amount, user_id, loc)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING request_id;
         `;
 
         const requestValues = [
@@ -188,7 +211,8 @@ app.post("/postdemand", authenticateToken, async (req, res) => {
             spendingcategory,
             location,
             price_offered * quantity,
-            req.user.user_id
+            req.user.user_id,
+            loc
         ];
 
         const requestResult = await db.query(requestQuery, requestValues);
@@ -239,10 +263,11 @@ app.get("/timeline/:request_id", authenticateToken, async (req, res) => {
 
 
 app.post("/reguser", async (req, res) => {
-    console.log("Received registration request"); 
-    console.log("Request Body:", req.body);
+    // console.log("Received registration request"); 
+    // console.log("Request Body:", req.body);
     const { fname, lname, username: email, password } = req.body;
-
+    
+        
     try {
         const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [email]);
 
@@ -257,10 +282,10 @@ app.post("/reguser", async (req, res) => {
                 return res.status(500).send("Server error. Please try again.");
             }
 
-            console.log("Hashed Password:", hash);
+           // console.log("Hashed Password:", hash);
 
             await db.query(
-                "INSERT INTO users (name, email, password) VALUES ($1, $2, $3)",
+                "INSERT INTO users (name, email, password, location) VALUES ($1, $2, $3)",
                 [fname+" "+lname, email, hash]
             );
 
@@ -276,6 +301,7 @@ app.post("/reguser", async (req, res) => {
 app.post("/login", async (req, res) => {
     const email = req.body.username;
     const loginPassword = req.body.password;
+    
 
     try {
         const result = await db.query("SELECT * FROM users WHERE email = $1", [email]);
@@ -323,14 +349,17 @@ app.get("/home", authenticateToken, async (req, res) => {
         ]);
 
         const userData = userResult.rows[0];
+        const userLocation = req.user.location.loc;
+
 
         let filteredRequests = result.rows.map(row => ({
             ...row,
             delivery_deadline: row.delivery_deadline.toISOString().split('T')[0],
-            proposals: formatProposals(row.proposals),
-            posted_time: calculatePostedTime(row.created_at)
+            posted_time: calculatePostedTime(row.created_at),
+            proposals: row.loc ? `${calculateDistance(userLocation, row.loc)} km` : 'N/A'
         }));
 
+        
 
         if (filterMyDemands) {
             filteredRequests = filteredRequests.filter(request =>
@@ -346,6 +375,7 @@ app.get("/home", authenticateToken, async (req, res) => {
                 .filter(request => request.accepted_by === null)
                 .filter(request => request.user_id != userData.user_id);
         }
+        console.log(filteredRequests);
 
         res.render('home', { 
             requests: filteredRequests,
@@ -416,7 +446,7 @@ app.post('/submit-buyer-profile', authenticateToken, async (req, res) => {
         );
         res.status(200).redirect('home');
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({ error: 'Failed to submit buyer profile' });
     }
 });
@@ -560,20 +590,22 @@ app.get('/chat_list/:userId', authenticateToken, async (req, res) => {
         const query = `
             SELECT 
                 r.request_id, r.crop_name, 
-                u1.name AS farmer_name, u1.user_id AS farmer_id,
-                u2.name AS buyer_name, u2.user_id AS buyer_id
+                CASE 
+                    WHEN u1.user_id = $1 THEN u2.name 
+                    ELSE u1.name 
+                END AS chat_partner_name,
+                CASE 
+                    WHEN u1.user_id = $1 THEN u2.user_id 
+                    ELSE u1.user_id 
+                END AS chat_partner_id
             FROM requests r
             JOIN users u1 ON u1.user_id = r.user_id  -- Farmer (request creator)
-            JOIN users u2 ON u2.user_id = (SELECT user_id FROM users WHERE email = r.accepted_by)  -- Buyer (who accepted)
+            JOIN users u2 ON u2.email = r.accepted_by  -- Buyer (who accepted)
             WHERE r.status = 'accepted' 
               AND ($1 = u1.user_id OR $1 = u2.user_id)  -- Only involved users can see
         `;
 
         const { rows } = await db.query(query, [userId]);
-
-        if (rows.length === 0) {
-            return res.render("chat_list.ejs", { chats: [] });
-        }
 
         res.render("chat_list.ejs", { chats: rows });
     } catch (error) {
@@ -594,7 +626,7 @@ app.get('/chat', authenticateToken, async (req, res) => {
         console.log("Fetching chat for Request ID:", requestId);
         console.log("Sender ID:", senderId);
 
-        // Fetch chat details, including the receiver ID
+        // Fetch chat details to determine the chat partner
         const chatInfo = await db.query(
             `SELECT DISTINCT sender_id, receiver_id 
              FROM chats 
@@ -613,6 +645,18 @@ app.get('/chat', authenticateToken, async (req, res) => {
 
         console.log("Receiver ID:", chatPartnerId);
 
+        // Fetch chat partner’s name
+        const chatPartnerData = await db.query(
+            `SELECT name FROM users WHERE user_id = $1`,
+            [chatPartnerId]
+        );
+
+        const chatPartnerName = chatPartnerData.rows.length > 0 
+            ? chatPartnerData.rows[0].name 
+            : "Unknown User";
+
+        console.log("Chat Partner Name:", chatPartnerName);
+
         // Fetch chat messages
         const { rows: chatMessages } = await db.query(
             `SELECT sender_id, message, timestamp 
@@ -625,7 +669,8 @@ app.get('/chat', authenticateToken, async (req, res) => {
         res.render("chat.ejs", {
             user: req.user,
             requestId,
-            receiverId: chatPartnerId,  // Receiver is fetched dynamically
+            receiverId: chatPartnerId,
+            receiverName: chatPartnerName,  // Pass the name to EJS
             senderId,
             messages: chatMessages || []
         });
