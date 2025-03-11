@@ -285,7 +285,7 @@ app.post("/reguser", async (req, res) => {
            // console.log("Hashed Password:", hash);
 
             await db.query(
-                "INSERT INTO users (name, email, password, location) VALUES ($1, $2, $3)",
+                "INSERT INTO users (name, email, password) VALUES ($1, $2, $3)",
                 [fname+" "+lname, email, hash]
             );
 
