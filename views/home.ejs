@@ -83,13 +83,12 @@
                         <li>
                             <div class="dropdown">
                                 <a href="#" id="profileDropdown" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle text-white" style="font-size: 32px;"></i>
+                                    <i class="bi bi-person-circle text-white" style="font-size: 35px;margin-left: 20px;"></i>
                                 </a>
                                 <ul class="dropdown-menu text-small shadow">
                                     <li><a class="dropdown-item" href="/profile">Profile</a></li>
                                     <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#farmerProfileModal">Farmer Profile</a></li>
                                     <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#buyerProfileModal">Buyer Profile</a></li>
-                                    <li><a class="dropdown-item" href="/payment">Payments</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/home/logout">Sign out</a></li>
                                 </ul>
@@ -129,24 +128,27 @@
                         <img id="homeimg" src="assets/home.png" alt="this is an image" style="border-radius: 15px;">
                         <img id="demandimg" src="assets/demand.png" alt="this is an image" style="border-radius: 15px;">
                     </div>
-
+                    
                     <script>
                         document.addEventListener("DOMContentLoaded", function () {
-                            const homeIcon = document.getElementById('homeIcon');
-                            const myDemandsIcon = document.getElementById('myDemandsIcon');
-                            const homeImg = document.getElementById('homeimg');
-                            const demandImg = document.getElementById('demandimg');
+                            setTimeout(function () {
+                                const homeIcon = document.getElementById('homeIcon');
+                                const myDemandsIcon = document.getElementById('myDemandsIcon');
+                                const homeImg = document.getElementById('homeimg');
+                                const demandImg = document.getElementById('demandimg');
                     
-                            if (homeIcon && homeIcon.classList.contains('text-warning')) {
-                                demandImg.style.display = 'none';
-                            } 
-                            if (myDemandsIcon && myDemandsIcon.classList.contains('text-warning')) {
-                                Img.style.display = 'none'; 
-                            }
+                                if (homeIcon && homeIcon.classList.contains('text-warning')) {
+                                    demandImg.style.display = 'none';
+                                } 
+                                if (myDemandsIcon && myDemandsIcon.classList.contains('text-warning')) {
+                                    homeImg.style.display = 'none'; 
+                                }
+                            }, 100); // Short delay ensures icons are loaded
                         });
                     </script>
                     
-                    </script>
+                    
+                    
                     
                     <!-- input search -->
                     <div class="row" style="width: 100%">
@@ -157,10 +159,10 @@
                                 <button class="btn btn-outline-success dropdown-toggle d-flex align-items-center justify-content-center" 
                                     type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false" 
                                     style="border-radius: 8px; height: 50px; min-width: 140px;">
-                                    Sort By: Normal
+                                    Sort By: Most Recent
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" data-value="">Normal</a></li>
+                                    <li><a class="dropdown-item" href="#" data-value="">Most Recent</a></li>
                                     <li><a class="dropdown-item" href="#" data-value="ai_rating">AI Rating</a></li>
                                     <li><a class="dropdown-item" href="#" data-value="distance">Distance</a></li>
                                 </ul>
