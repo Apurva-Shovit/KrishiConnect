@@ -9,7 +9,7 @@
 // const apiKey = process.env.GEMINI_API_KEY;
 
 // if (!apiKey) {
-//   console.error("❌ ERROR: Missing Gemini API Key in .env file.");
+//   console.error(" ERROR: Missing Gemini API Key in .env file.");
 //   process.exit(1);
 // }
 
@@ -73,20 +73,20 @@
 // app.post("/chat", async (req, res) => {
 //   try {
 //     const { message } = req.body;
-//     console.log("📝 Received:", message);
+//     console.log(" Received:", message);
 
 //     const result = await chatSession.sendMessage(message);
 //     const botResponse = result.response.text() || "Sorry, I couldn't understand that.";
 
-//     console.log("🤖 AgriBuddy:", botResponse);
+//     console.log(" AgriBuddy:", botResponse);
 //     res.json({ response: botResponse });
 //   } catch (error) {
-//     console.error("❌ Error:", error?.message || "Unknown error occurred.");
+//     console.error(" Error:", error?.message || "Unknown error occurred.");
 //     res.status(500).json({ error: "Internal Server Error" });
 //   }
 // });
 
-// app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// app.listen(PORT, () => console.log(` Server running on http://localhost:${PORT}`));
 
 import "dotenv/config";
 import express from "express";
@@ -107,14 +107,14 @@ const pool = new pg.Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
-  password: process.env.DB_PASS,
+  password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
 });
 
 // AI Chatbot setup
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
-  console.error("❌ ERROR: Missing Gemini API Key in .env file.");
+  console.error(" ERROR: Missing Gemini API Key in .env file.");
   process.exit(1);
 }
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -177,15 +177,15 @@ app.use(express.static("public"));
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
-    console.log("📝 Received:", message);
+    console.log(" Received:", message);
 
     const result = await chatSession.sendMessage(message);
     const botResponse = result.response.text() || "Sorry, I couldn't understand that.";
 
-    console.log("🤖 AgriBuddy:", botResponse);
+    console.log(" AgriBuddy:", botResponse);
     res.json({ response: botResponse });
   } catch (error) {
-    console.error("❌ Error:", error.message || "Unknown error occurred.");
+    console.error(" Error:", error.message || "Unknown error occurred.");
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -229,7 +229,7 @@ app.get("/chat-history/:requestId", async (req, res) => {
 const clients = {};
 
 wss.on("connection", (ws) => {
-    console.log("✅ New WebSocket Connection");
+    console.log(" New WebSocket Connection");
 
     ws.on("message", async (message) => {
         const data = JSON.parse(message);
@@ -243,20 +243,18 @@ wss.on("connection", (ws) => {
             const { requestId, senderId, receiverId, messageText } = data;
 
             try {
-                // ✅ Save message in database
                 await pool.query(
                     "INSERT INTO chats (request_id, sender_id, receiver_id, message) VALUES ($1, $2, $3, $4)",
                     [requestId, senderId, receiverId, messageText]
                 );
 
-                // ✅ Broadcast to recipient
                 if (clients[receiverId]) {
                     clients[receiverId].send(
                         JSON.stringify({ type: "chat", senderId, messageText })
                     );
                 }
             } catch (err) {
-                console.error("❌ Database Error:", err);
+                console.error(" Database Error:", err);
             }
         }
     });
@@ -268,4 +266,4 @@ wss.on("connection", (ws) => {
     });
 });
 
-server.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(` Server running on http://localhost:${PORT}`));

@@ -140,11 +140,11 @@
 
             messageInput.focus(); // Auto-focus on input field
 
-            // ✅ Connect WebSocket
+            // Connect WebSocket
             const socket = new WebSocket("ws://localhost:5000");
 
             socket.onopen = () => {
-                console.log("✅ WebSocket Connected");
+                console.log("WebSocket Connected");
                 socket.send(JSON.stringify({ type: "connect", userId: senderId }));
             };
 
