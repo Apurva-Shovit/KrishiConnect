@@ -25,97 +25,82 @@
     
     
      <!--navbar  -->
-    <div class="px-3 py-1 border-bottom" style="background-color: #3d6a25;">
+     <div class="px-3 py-1 border-bottom position-sticky top-0 z-3" style="background-color: #3d6a25;">
         <div class="container-fluid">
-          <div class="d-flex flex-wrap align-items-center justify-content-between w-100">
-            <a href="/" class="d-flex align-items-center my-2 my-lg-0 me-auto text-white text-decoration-none">
-              <div class="d-flex align-items-center"> <!-- Add align-items-center here -->
-                  <img class="box" src="assets/logo_smol.png" alt="KrishiConnect_logo" width="75" style="margin-right: 20px;">
-                  
-                  <h3 class="box mb-0">KrishiConnect</h3> <!-- Use mb-0 to remove default margins -->
-              </div>    
-          </a>
-          
-  
-          <ul class="nav col-12 col-lg-auto my-2 mx-auto my-md-0 text-small d-flex justify-content-center">
-                <li>
-                    <a href="/home" class="nav-link text-white d-flex flex-column align-items-center" onclick="highlightLink(this)">
-                        <i class="bi bi-house text-warning" id="homeIcon" style="font-size: 22px;"></i>
-                        Home
-                    </a>
-                </li>
-                
-                <li>
-                    <a href="/home?filter=myDemands" class="nav-link text-white d-flex flex-column align-items-center" onclick="highlightLink(this)">
-                        <i class="bi bi-card-text" id="myDemandsIcon" style="font-size: 22px;"></i>
-                        MyDemands
-                    </a>
-                </li>
-            
-              <li>
-                <a href="#" class="nav-link text-white d-flex flex-column align-items-center">
-                  <i class="bi bi-bell" style="font-size: 22px;"></i>
-                  Notifications
+            <div class="d-flex flex-wrap align-items-center justify-content-between w-100">
+    
+                <!-- Logo -->
+                <a href="/" class="d-flex align-items-center my-2 my-lg-0 text-white text-decoration-none">
+                    <div class="d-flex align-items-center">
+                        <img class="box" src="assets/logo_smol.png" alt="KrishiConnect_logo" width="75" style="margin-right: 20px;">
+                        <h3 class="box mb-0">KrishiConnect</h3>
+                    </div>
                 </a>
-              </li>
-              <li>
-                <a id="chatLink" href="#" class="nav-link text-white d-flex flex-column align-items-center">
-                    <i class="bi bi-chat-dots" style="font-size: 22px;"></i>
-                    Chat
-                </a>
-            </li>
-            <script>
-                
-               
-            </script>
-            
-            </ul>
-            <ul class="nav col-12 col-lg-auto my-2 ms-auto my-md-0 text-small d-flex justify-content-end">
-              <div class="d-flex align-items-center">
-              
-                <li>
-                    <% if (user.buyer_profile_completed) { %>
-                        <a href="/postdemandpage" class="nav-link text-white d-flex flex-column align-items-center">
-                            <button type="" class="btn btn-outline-light" fdprocessedid="bx833o">
-                                <i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand
-                            </button>
+    
+                <!-- Centered Navigation -->
+                <ul class="nav col-12 col-lg-auto my-2 my-md-0 text-small d-flex justify-content-center flex-grow-1">
+                    <li>
+                        <a href="/home" class="nav-link text-white d-flex flex-column align-items-center" onclick="highlightLink(this)">
+                            <i class="bi bi-house text-warning" id="homeIcon" style="font-size: 35px;"></i>
+                            
                         </a>
-                    <% } else { %>
-                        <div class="nav-link text-white d-flex flex-column align-items-center">
-                            <button type="button" class="btn btn-outline-light" disabled>
-                                <i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand
-                            </button>
-                            <span class="text-danger mt-2">Complete your buyer profile to post demands.</span>
-                        </div>
-                    <% } %>
-                </li>
-                
-              <li>
-                
-  
-            <div class="dropdown">
-                <a href="#" id="profileDropdown" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle text-white" style="font-size: 32px; "></i>
-                </a>
-                <ul class="dropdown-menu text-small shadow" 
-                    aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                    <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#farmerProfileModal">Farmer Profile</a></li>
-                    <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#buyerProfileModal">Buyer Profile</a></li>
-                    <li><a class="dropdown-item" href="/payment" action="/payment" method="GET">Payments</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="/home/logout">Sign out</a></li>
+                    </li>
+                    <li>
+                        <a href="/home?filter=myDemands" class="nav-link text-white d-flex flex-column align-items-center" onclick="highlightLink(this)">
+                            <i class="bi bi-card-text" id="myDemandsIcon" style="font-size: 35px;margin-left: 30px;margin-right: 30px;"></i>
+                            
+                        </a>
+                    </li>
+                    <li>
+                        <a id="chatLink" href="#" class="nav-link text-white d-flex flex-column align-items-center">
+                            <i class="bi bi-chat-dots" style="font-size: 35px;"></i>
+                            
+                        </a>
+                    </li>
+                </ul>
+    
+                <!-- Right-Side Buttons & Profile -->
+                <ul class="nav col-12 col-lg-auto my-2 my-md-0 text-small d-flex justify-content-end">
+                    <div class="d-flex align-items-center">
+                        <li>
+                            <% if (user.buyer_profile_completed) { %>
+                                <a href="/postdemandpage" class="nav-link text-white d-flex flex-column align-items-center">
+                                    <button type="button" class="btn btn-outline-light">
+                                        <i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand
+                                    </button>
+                                </a>
+                            <% } else { %>
+                                <div class="nav-link text-white d-flex flex-column align-items-center">
+                                    <button type="button" class="btn btn-outline-light" disabled>
+                                        <i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand
+                                    </button>
+                                    <span class="text-danger mt-2">Complete your buyer profile to post demands.</span>
+                                </div>
+                            <% } %>
+                        </li>
+    
+                        <!-- Profile Dropdown -->
+                        <li>
+                            <div class="dropdown">
+                                <a href="#" id="profileDropdown" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle text-white" style="font-size: 32px;"></i>
+                                </a>
+                                <ul class="dropdown-menu text-small shadow">
+                                    <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                                    <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#farmerProfileModal">Farmer Profile</a></li>
+                                    <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#buyerProfileModal">Buyer Profile</a></li>
+                                    <li><a class="dropdown-item" href="/payment">Payments</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/home/logout">Sign out</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </div>
                 </ul>
             </div>
-            
-              </div>
-                    
-              
-            </ul>
-            
-          </div>
         </div>
     </div>
+    
 <!-- navbar -->
 
 
@@ -156,7 +141,7 @@
                                 demandImg.style.display = 'none';
                             } 
                             if (myDemandsIcon && myDemandsIcon.classList.contains('text-warning')) {
-                                demandImg.style.display = 'none';
+                                Img.style.display = 'none'; 
                             }
                         });
                     </script>
@@ -203,20 +188,22 @@
                     <!-- just displays the selected value in dropdown on top of deopdown -->
                     <script>
                         document.addEventListener("DOMContentLoaded", function() {
-                            const dropdownItems = document.querySelectorAll(".dropdown-item");
-                            const dropdownButton = document.getElementById("sortDropdown");
+                            const sortDropdown = document.getElementById("sortDropdown");
+                            const sortDropdownMenu = sortDropdown.nextElementSibling; // Get the associated dropdown menu
                             const sortByInput = document.getElementById("sortByInput");
                     
-                            dropdownItems.forEach(item => {
-                                item.addEventListener("click", function(event) {
-                                    event.preventDefault();
-                                    const selectedText = this.textContent;
-                                    const selectedValue = this.getAttribute("data-value");
+                            if (sortDropdownMenu) {
+                                sortDropdownMenu.querySelectorAll(".dropdown-item").forEach(item => {
+                                    item.addEventListener("click", function(event) {
+                                        event.preventDefault();
+                                        const selectedText = this.textContent;
+                                        const selectedValue = this.getAttribute("data-value");
                     
-                                    dropdownButton.textContent = "Sort By: " + selectedText;
-                                    sortByInput.value = selectedValue;
+                                        sortDropdown.innerHTML = `Sort By: ${selectedText}`;
+                                        sortByInput.value = selectedValue;
+                                    });
                                 });
-                            });
+                            }
                         });
                     </script>
                     
@@ -280,6 +267,7 @@
                                                 <button 
                                                     type="button" 
                                                     class="btn btn-success" 
+                                                    
                                                     onclick="fetchRequestDetails('<%= request.request_id %>')">
                                                     Accept Request
                                                 </button>
