@@ -31,6 +31,7 @@
             <a href="/" class="d-flex align-items-center my-2 my-lg-0 me-auto text-white text-decoration-none">
               <div class="d-flex align-items-center"> <!-- Add align-items-center here -->
                   <img class="box" src="assets/logo_smol.png" alt="KrishiConnect_logo" width="75" style="margin-right: 20px;">
+                  
                   <h3 class="box mb-0">KrishiConnect</h3> <!-- Use mb-0 to remove default margins -->
               </div>    
           </a>
@@ -141,30 +142,66 @@
                     <!-- image -->
                     <div class="row" style="width:100%; padding-bottom: 20px;">
                         <img src="assets/home.png" alt="this is an image" style="border-radius: 15px;">
+                        <img src="assets/demand.png" alt="this is an image" style="border-radius: 15px;">
                     </div>
                     <!-- input search -->
-                    <div class="row" style="width:100%">
+                    <div class="row" style="width: 100%">
                         <form id="searchForm" method="GET" action="/home/search" class="d-flex align-items-center">
+    
+                            <!-- Dropdown for sorting -->
+                            <div class="dropdown me-2">
+                                <button class="btn btn-outline-success dropdown-toggle d-flex align-items-center justify-content-center" 
+                                    type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false" 
+                                    style="border-radius: 8px; height: 50px; min-width: 140px;">
+                                    Sort By: Normal
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" data-value="">Normal</a></li>
+                                    <li><a class="dropdown-item" href="#" data-value="ai_rating">AI Rating</a></li>
+                                    <li><a class="dropdown-item" href="#" data-value="distance">Distance</a></li>
+                                </ul>
+                                <input type="hidden" name="sortBy" id="sortByInput" value="">
+                            </div>
+                        
+                            <!-- Search Input -->
                             <input 
                                 name="query" 
-                                aria-labelledby="cfe-job-search-label" 
                                 type="search" 
                                 autocomplete="off" 
-                                autocorrect="off" 
-                                autocapitalize="off" 
-                                spellcheck="false" 
-                                placeholder="Search for crop-name, description or location" 
-                                value="" 
-                                class="air3-typeahead-input-fake air3-input form-control me-2"
-                                style="flex: 1; min-width: 200px;">
-                            <button type="submit" class="btn btn-primary" 
-                                style="border-radius: 15px; background-color: #3d6a25; border-color: #198754;">
-                                Search
+                                placeholder="Search for crop-name, description, or location" 
+                                class="form-control me-2 border-dark"
+                                style="flex: 1; min-width: 200px; height: 50px; border-radius: 8px;">
+                            
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-outline-success d-flex align-items-center justify-content-center" 
+                                style="width: 50px; height: 50px; border-radius: 8px;">
+                                <i class="bi bi-search fs-1"></i>
                             </button>
+                        
                         </form>
                         
-                        
                     </div>
+                    <!-- just displays the selected value in dropdown on top of deopdown -->
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            const dropdownItems = document.querySelectorAll(".dropdown-item");
+                            const dropdownButton = document.getElementById("sortDropdown");
+                            const sortByInput = document.getElementById("sortByInput");
+                    
+                            dropdownItems.forEach(item => {
+                                item.addEventListener("click", function(event) {
+                                    event.preventDefault();
+                                    const selectedText = this.textContent;
+                                    const selectedValue = this.getAttribute("data-value");
+                    
+                                    dropdownButton.textContent = "Sort By: " + selectedText;
+                                    sortByInput.value = selectedValue;
+                                });
+                            });
+                        });
+                    </script>
+                    
+                    
 
                     <!-- request container -->
 
@@ -206,7 +243,7 @@
                                             </span>
                                             <i class="bi bi-geo-alt" style="margin-left: 12px; margin-right: 4px;"></i>
                                             <%= request.location %>
-                                            <span style="margin-left: 12px;">Proposals: <%= request.proposals %></span>
+                                            <span style="margin-left: 12px;">Distance: <%= request.proposals %></span>
                                         </div>
                     
                                         <% if (request.user_id === user.user_id) { %>
