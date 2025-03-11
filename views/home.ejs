@@ -225,7 +225,7 @@
                                             <% } else { %>
                                                 <div style="display: flex; flex-direction: column; align-items: flex-start;">
                                                     <button class="btn btn-success" disabled>
-                                                        Accept Request
+                                                        Accept Request  
                                                     </button>
                                                     <div class="text-danger mt-2">
                                                         Farmer Profile Incomplete!!!
@@ -548,50 +548,70 @@
 
 
     <script>
+    function vote(icon, type) {
+        const parentDiv = icon.parentElement;
+        const countElement = parentDiv.querySelector(type === 'up' ? '.upvote-count' : '.downvote-count');
+        let count = parseInt(countElement.innerText, 10);
+        countElement.innerText = count + 1;
+    }
 
-        function vote(icon, type) {
-            const parentDiv = icon.parentElement;
-            const countElement = parentDiv.querySelector(type === 'up' ? '.upvote-count' : '.downvote-count');
-            let count = parseInt(countElement.innerText, 10);
-            countElement.innerText = count + 1;
+    function openRequestDetails(name, location, company, crop, quantity, offerPrice, totalAmount, requestId) {
+        document.getElementById('buyerName').innerText = name || 'working on it...';
+        document.getElementById('buyerLocation').innerText = location || 'working on it...';
+        document.getElementById('buyerCompany').innerText = company || 'working on it...';
+        document.getElementById('cropName').innerText = crop;
+        document.getElementById('quantity').innerText = quantity;
+        document.getElementById('offerPrice').innerText = offerPrice;
+        document.getElementById('totalAmount').innerText = totalAmount;
+        document.getElementById('request_id').value = requestId;
+        new bootstrap.Modal(document.getElementById('requestDetailsModal')).show();
+    }
+
+    async function fetchRequestDetails(requestId) {
+        try {
+            // Fetch request details
+            const response = await fetch(`/home/request?request_id=${requestId}`);
+            const requestData = await response.json(); // Corrected variable name
+            
+            // Fetch timeline data
+            const respo = await fetch(`/timeline/${requestId}`);
+            const timelineData = await respo.json(); // Corrected JSON parsing
+
+            // Update Timeline Table
+            const tableBody = document.getElementById("timelineTableBody");
+            tableBody.innerHTML = ""; // Clear existing rows
+
+            timelineData.forEach((stage, index) => {
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${stage.stage_title}</td>
+                        <td>${stage.stage_date}</td>
+                        <td>${stage.stage_description}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+            // Pass request data to openRequestDetails function
+            openRequestDetails(
+                requestData.buyer_name,
+                requestData.buyer_location,
+                requestData.buyer_company,
+                requestData.crop_name,
+                requestData.quantity,
+                requestData.offer_price,
+                requestData.total_amount,
+                requestData.request_id
+            );
+
+        } catch (error) {
+            console.error("Error fetching request details:", error);
         }
+    }
+</script>
 
 
-        function openRequestDetails(name, location, company, crop, quantity, offerPrice, totalAmount, requestId) {
-            document.getElementById('buyerName').innerText = name || 'working on it...';
-            document.getElementById('buyerLocation').innerText = location || 'working on it...';
-            document.getElementById('buyerCompany').innerText = company || 'working on it...';
-            document.getElementById('cropName').innerText = crop;
-            document.getElementById('quantity').innerText = quantity;
-            document.getElementById('offerPrice').innerText = offerPrice;
-            document.getElementById('totalAmount').innerText = totalAmount;
-            document.getElementById('request_id').value = requestId;
-            new bootstrap.Modal(document.getElementById('requestDetailsModal')).show();
-        }
-
-        async function fetchRequestDetails(requestId) {
-            try {
-                const response = await fetch(`/home/request?request_id=${requestId}`);
-                const data = await response.json();
-
-
-                openRequestDetails(
-                    data.buyer_name,
-                    data.buyer_location,
-                    data.buyer_company,
-                    data.crop_name,
-                    data.quantity,
-                    data.offer_price,
-                    data.total_amount,
-                    data.request_id
-                );
-            } catch (error) {
-                console.error('Error fetching request details:', error);
-            }
-        }
-
-
-    </script>
    
 
    <div class="modal fade" id="farmerProfileModal" tabindex="-1" aria-labelledby="farmerProfileModalLabel" aria-hidden="true">
@@ -751,11 +771,20 @@
                         <p><strong>Price per kg:</strong> Rs. <span id="offerPrice"></span></p>
                         <p><strong>Total Price:</strong> Rs. <span id="totalAmount"></span></p>
                     </div>
-    
-                    <div id="timelineSection">
-                        <h6>Timeline</h6>
-                        <p>Coming soon...</p>
-                    </div>
+                    <table class="table table-bordered mt-4">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Stage Title</th>
+                                <th>Stage Date</th>
+                                <th>Stage Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timelineTableBody">
+                            <!-- Data will be inserted dynamically here -->
+                        </tbody>
+                    </table>
+                        
     
                     <form  method="POST" action="/home/AcceptRequest">
                         <input type="hidden" name="request_id" id="request_id">
