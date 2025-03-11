@@ -176,7 +176,7 @@ app.post("/postdemand", authenticateToken, async (req, res) => {
         // Insert into requests table
         const requestQuery = `
             INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location, total_amount, user_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING user_id;
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING request_id;
         `;
 
         const requestValues = [
@@ -192,7 +192,7 @@ app.post("/postdemand", authenticateToken, async (req, res) => {
         ];
 
         const requestResult = await db.query(requestQuery, requestValues);
-        const requestId = requestResult.rows[0].user_id; // Get inserted request ID
+        const requestId = requestResult.rows[0].request_id; // Get inserted request ID
 
         // Insert into demand_timeline table
         const timelineQuery = `
@@ -204,7 +204,7 @@ app.post("/postdemand", authenticateToken, async (req, res) => {
             await db.query(timelineQuery, [requestId, node_titles[i], node_dates[i], node_descriptions[i]]);
         }
 
-        res.status(201).json({ message: "Demand posted successfully", requestId });
+        res.redirect("home");
     } catch (error) {
         console.error("Error posting demand:", error);
         res.status(500).json({ error: "Internal Server Error" });
@@ -224,12 +224,18 @@ app.get("/timeline/:request_id", authenticateToken, async (req, res) => {
 
         const result = await db.query(query, [requestId]);
 
-        res.json(result.rows); // Send JSON response instead of rendering EJS
+        const formattedResult = result.rows.map(item => ({
+            ...item,
+            stage_date: new Date(item.stage_date).toISOString().split('T')[0]
+        }));
+
+        res.json(formattedResult);
     } catch (error) {
         console.error("Error fetching timeline:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
 
 
 app.post("/reguser", async (req, res) => {
