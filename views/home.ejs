@@ -25,97 +25,82 @@
     
     
      <!--navbar  -->
-    <div class="px-3 py-1 border-bottom" style="background-color: #3d6a25;">
+     <div class="px-3 py-1 border-bottom position-sticky top-0 z-3" style="background-color: #3d6a25;">
         <div class="container-fluid">
-          <div class="d-flex flex-wrap align-items-center justify-content-between w-100">
-            <a href="/" class="d-flex align-items-center my-2 my-lg-0 me-auto text-white text-decoration-none">
-              <div class="d-flex align-items-center"> <!-- Add align-items-center here -->
-                  <img class="box" src="assets/logo_smol.png" alt="KrishiConnect_logo" width="75" style="margin-right: 20px;">
-                  
-                  <h3 class="box mb-0">KrishiConnect</h3> <!-- Use mb-0 to remove default margins -->
-              </div>    
-          </a>
-          
-  
-          <ul class="nav col-12 col-lg-auto my-2 mx-auto my-md-0 text-small d-flex justify-content-center">
-                <li>
-                    <a href="/home" class="nav-link text-white d-flex flex-column align-items-center" onclick="highlightLink(this)">
-                        <i class="bi bi-house text-warning" id="homeIcon" style="font-size: 22px;"></i>
-                        Home
-                    </a>
-                </li>
-                
-                <li>
-                    <a href="/home?filter=myDemands" class="nav-link text-white d-flex flex-column align-items-center" onclick="highlightLink(this)">
-                        <i class="bi bi-card-text" id="myDemandsIcon" style="font-size: 22px;"></i>
-                        MyDemands
-                    </a>
-                </li>
-            
-              <li>
-                <a href="#" class="nav-link text-white d-flex flex-column align-items-center">
-                  <i class="bi bi-bell" style="font-size: 22px;"></i>
-                  Notifications
+            <div class="d-flex flex-wrap align-items-center justify-content-between w-100">
+    
+                <!-- Logo -->
+                <a href="/" class="d-flex align-items-center my-2 my-lg-0 text-white text-decoration-none">
+                    <div class="d-flex align-items-center">
+                        <img class="box" src="assets/logo_smol.png" alt="KrishiConnect_logo" width="75" style="margin-right: 20px;">
+                        <h3 class="box mb-0">KrishiConnect</h3>
+                    </div>
                 </a>
-              </li>
-              <li>
-                <a id="chatLink" href="#" class="nav-link text-white d-flex flex-column align-items-center">
-                    <i class="bi bi-chat-dots" style="font-size: 22px;"></i>
-                    Chat
-                </a>
-            </li>
-            <script>
-                
-               
-            </script>
-            
-            </ul>
-            <ul class="nav col-12 col-lg-auto my-2 ms-auto my-md-0 text-small d-flex justify-content-end">
-              <div class="d-flex align-items-center">
-              
-                <li>
-                    <% if (user.buyer_profile_completed) { %>
-                        <a href="/postdemandpage" class="nav-link text-white d-flex flex-column align-items-center">
-                            <button type="" class="btn btn-outline-light" fdprocessedid="bx833o">
-                                <i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand
-                            </button>
+    
+                <!-- Centered Navigation -->
+                <ul class="nav col-12 col-lg-auto my-2 my-md-0 text-small d-flex justify-content-center flex-grow-1">
+                    <li>
+                        <a href="/home" class="nav-link text-white d-flex flex-column align-items-center" onclick="highlightLink(this)">
+                            <i class="bi bi-house text-warning" id="homeIcon" style="font-size: 35px;"></i>
+                            
                         </a>
-                    <% } else { %>
-                        <div class="nav-link text-white d-flex flex-column align-items-center">
-                            <button type="button" class="btn btn-outline-light" disabled>
-                                <i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand
-                            </button>
-                            <span class="text-danger mt-2">Complete your buyer profile to post demands.</span>
-                        </div>
-                    <% } %>
-                </li>
-                
-              <li>
-                
-  
-            <div class="dropdown">
-                <a href="#" id="profileDropdown" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle text-white" style="font-size: 32px; "></i>
-                </a>
-                <ul class="dropdown-menu text-small shadow" 
-                    aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                    <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#farmerProfileModal">Farmer Profile</a></li>
-                    <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#buyerProfileModal">Buyer Profile</a></li>
-                    <li><a class="dropdown-item" href="/payment" action="/payment" method="GET">Payments</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="/home/logout">Sign out</a></li>
+                    </li>
+                    <li>
+                        <a href="/home?filter=myDemands" class="nav-link text-white d-flex flex-column align-items-center" onclick="highlightLink(this)">
+                            <i class="bi bi-card-text" id="myDemandsIcon" style="font-size: 35px;margin-left: 30px;margin-right: 30px;"></i>
+                            
+                        </a>
+                    </li>
+                    <li>
+                        <a id="chatLink" href="#" class="nav-link text-white d-flex flex-column align-items-center">
+                            <i class="bi bi-chat-dots" style="font-size: 35px;"></i>
+                            
+                        </a>
+                    </li>
+                </ul>
+    
+                <!-- Right-Side Buttons & Profile -->
+                <ul class="nav col-12 col-lg-auto my-2 my-md-0 text-small d-flex justify-content-end">
+                    <div class="d-flex align-items-center">
+                        <li>
+                            <% if (user.buyer_profile_completed) { %>
+                                <a href="/postdemandpage" class="nav-link text-white d-flex flex-column align-items-center">
+                                    <button type="button" class="btn btn-outline-light">
+                                        <i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand
+                                    </button>
+                                </a>
+                            <% } else { %>
+                                <div class="nav-link text-white d-flex flex-column align-items-center">
+                                    <button type="button" class="btn btn-outline-light" disabled>
+                                        <i class="bi bi-plus-lg text-white" style="margin-right: 5px;"></i>Post Demand
+                                    </button>
+                                    <span class="text-danger mt-2">Complete your buyer profile to post demands.</span>
+                                </div>
+                            <% } %>
+                        </li>
+    
+                        <!-- Profile Dropdown -->
+                        <li>
+                            <div class="dropdown">
+                                <a href="#" id="profileDropdown" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle text-white" style="font-size: 32px;"></i>
+                                </a>
+                                <ul class="dropdown-menu text-small shadow">
+                                    <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                                    <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#farmerProfileModal">Farmer Profile</a></li>
+                                    <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#buyerProfileModal">Buyer Profile</a></li>
+                                    <li><a class="dropdown-item" href="/payment">Payments</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/home/logout">Sign out</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </div>
                 </ul>
             </div>
-            
-              </div>
-                    
-              
-            </ul>
-            
-          </div>
         </div>
     </div>
+    
 <!-- navbar -->
 
 
@@ -141,9 +126,28 @@
 
                     <!-- image -->
                     <div class="row" style="width:100%; padding-bottom: 20px;">
-                        <img src="assets/home.png" alt="this is an image" style="border-radius: 15px;">
-                        <img src="assets/demand.png" alt="this is an image" style="border-radius: 15px;">
+                        <img id="homeimg" src="assets/home.png" alt="this is an image" style="border-radius: 15px;">
+                        <img id="demandimg" src="assets/demand.png" alt="this is an image" style="border-radius: 15px;">
                     </div>
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const homeIcon = document.getElementById('homeIcon');
+                            const myDemandsIcon = document.getElementById('myDemandsIcon');
+                            const homeImg = document.getElementById('homeimg');
+                            const demandImg = document.getElementById('demandimg');
+                    
+                            if (homeIcon && homeIcon.classList.contains('text-warning')) {
+                                demandImg.style.display = 'none';
+                            } 
+                            if (myDemandsIcon && myDemandsIcon.classList.contains('text-warning')) {
+                                Img.style.display = 'none'; 
+                            }
+                        });
+                    </script>
+                    
+                    </script>
+                    
                     <!-- input search -->
                     <div class="row" style="width: 100%">
                         <form id="searchForm" method="GET" action="/home/search" class="d-flex align-items-center">
@@ -184,20 +188,22 @@
                     <!-- just displays the selected value in dropdown on top of deopdown -->
                     <script>
                         document.addEventListener("DOMContentLoaded", function() {
-                            const dropdownItems = document.querySelectorAll(".dropdown-item");
-                            const dropdownButton = document.getElementById("sortDropdown");
+                            const sortDropdown = document.getElementById("sortDropdown");
+                            const sortDropdownMenu = sortDropdown.nextElementSibling; // Get the associated dropdown menu
                             const sortByInput = document.getElementById("sortByInput");
                     
-                            dropdownItems.forEach(item => {
-                                item.addEventListener("click", function(event) {
-                                    event.preventDefault();
-                                    const selectedText = this.textContent;
-                                    const selectedValue = this.getAttribute("data-value");
+                            if (sortDropdownMenu) {
+                                sortDropdownMenu.querySelectorAll(".dropdown-item").forEach(item => {
+                                    item.addEventListener("click", function(event) {
+                                        event.preventDefault();
+                                        const selectedText = this.textContent;
+                                        const selectedValue = this.getAttribute("data-value");
                     
-                                    dropdownButton.textContent = "Sort By: " + selectedText;
-                                    sortByInput.value = selectedValue;
+                                        sortDropdown.innerHTML = `Sort By: ${selectedText}`;
+                                        sortByInput.value = selectedValue;
+                                    });
                                 });
-                            });
+                            }
                         });
                     </script>
                     
@@ -261,6 +267,7 @@
                                                 <button 
                                                     type="button" 
                                                     class="btn btn-success" 
+                                                    
                                                     onclick="fetchRequestDetails('<%= request.request_id %>')">
                                                     Accept Request
                                                 </button>
@@ -310,53 +317,71 @@
                         </div>
                     <% } else { %>
                         <% if (profileStatus.includes('farmer')) { %>
-                            <div class="profile-card bg-light p-4 rounded shadow-sm mb-4">
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
-                                    <div>
-                                        <h3 class="mb-1"><%= user.name %></h3>
-                                        <span class="badge bg-success">Verified Farmer</span>
-                                    </div>
+                            <div class="profile-card bg-light border p-4 shadow-sm mb-4" style="border-radius: 40px; border-color: #bbb;">
+
+
+                                <div class="d-flex flex-column align-items-center text-center mb-3">
+                                    <!-- Icon (First Row) -->
+                                    <i class="bi bi-person text-dark" style="font-size: 100px;"></i>
+                                
+                                    <!-- Name (Second Row) -->
+                                    <h3 class="mb-1"><%= user.name %></h3>
+                                
+                                    <!-- Verified Badge (Third Row) -->
+                                    <span class="badge bg-success">Verified Farmer</span>
                                 </div>
-                                <div class="profile-info">
-                                    <p><strong>Location:</strong> <%= user.farmer_profile.location %></p>
-                                    <p><strong>Farm Size:</strong> <%= user.farmer_profile.farmSize %> Acres</p>
-                                    <p><strong>Crops Grown:</strong> <%= user.farmer_profile.cropsGrown.join(', ') %></p>
-                                    <p><strong>Experience:</strong> <%= user.farmer_profile.experience %> years</p>
-                                    <p><strong>Farming Methods:</strong> <%= user.farmer_profile.farmingMethods.join(', ') %></p>
-                                    <p><strong>Past Deals:</strong> <%= user.farmer_profile.past_deals %> Successful Transactions</p>
-                                    <p><strong>Ratings & Reviews:</strong> 
-                                        <%= '★'.repeat(Math.floor(user.farmer_profile.rating)) %>
-                                        <%= '☆'.repeat(5 - Math.floor(user.farmer_profile.rating)) %>
-                                        (<%= user.farmer_profile.rating.toFixed(1) %>/5)
+                                <hr>
+                                
+                                <div class="profile-info text-center">
+                                    <p>Location: <strong><%= user.farmer_profile.location %></strong></p>
+                                    <p><strong><%= user.farmer_profile.farmSize %> Acres</strong> of field</p>
+                                    <p>Crops Grown: <strong><%= user.farmer_profile.cropsGrown.join(', ') %></strong></p>
+                                    <p><strong><%= user.farmer_profile.experience %> years</strong> of experience</p>
+                                    <p>Farming Methods: <strong><%= user.farmer_profile.farmingMethods.join(', ') %></strong></p>
+                                    <p><strong><%= user.farmer_profile.past_deals %> Successful Transactions</strong></p>
+                                    <p>Rating : 
+                                        <strong>
+                                            <%= '★'.repeat(Math.floor(user.farmer_profile.rating)) %>
+                                            <%= '☆'.repeat(5 - Math.floor(user.farmer_profile.rating)) %>
+                                            (<%= user.farmer_profile.rating.toFixed(1) %>/5)
+                                        </strong>
                                     </p>
                                 </div>
+                                
                             </div>
                         <% } %>
                     
                         <% if (profileStatus.includes('buyer')) { %>
-                            <div class="profile-card bg-light p-4 rounded shadow-sm">
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
-                                    <div>
-                                        <h3 class="mb-1"><%= user.name %></h3>
-                                        <span class="badge bg-info">Verified Buyer</span>
-                                    </div>
+                            <div class="profile-card bg-light border p-4 shadow-sm mb-4" style="border-radius: 40px; border-color: #bbb;">
+                                <div class="d-flex flex-column align-items-center text-center mb-3">
+                                    <!-- Icon (First Row) -->
+                                    <i class="bi bi-person text-dark" style="font-size: 100px;"></i>
+                            
+                                    <!-- Name (Second Row) -->
+                                    <h3 class="mb-1"><%= user.name %></h3>
+                            
+                                    <!-- Verified Badge (Third Row) -->
+                                    <span class="badge bg-success">Verified Buyer</span>
                                 </div>
-                                <div class="profile-info">
-                                    <p><strong>Location:</strong> <%= user.buyer_profile.location %></p>
-                                    <p><strong>Company Name:</strong> <%= user.buyer_profile.companyName %></p>
-                                    <p><strong>Products Needed:</strong> <%= user.buyer_profile.productsNeeded.join(', ') %></p>
-                                    <p><strong>Preferred Quantities:</strong> <%= user.buyer_profile.preferredQuantities %></p>
-                                    <p><strong>Payment Reliability:</strong> <%= (user.buyer_profile.paymentReliability).toFixed(1) %>% Completion Rate</p>
-                                    <p><strong>Past Deals:</strong> <%= user.buyer_profile.past_deals %> Successful Transactions</p>
-                                    <p><strong>Ratings & Reviews:</strong> 
-                                        <%= '★'.repeat(Math.floor(user.buyer_profile.rating)) %>
-                                        <%= '☆'.repeat(5 - Math.floor(user.buyer_profile.rating)) %>
-                                        (<%= user.buyer_profile.rating.toFixed(1) %>/5)
+                                <hr>
+                            
+                                <div class="profile-info text-center">
+                                    <p>Location: <strong><%= user.buyer_profile.location %></strong></p>
+                                    <p>Buyer Name: <strong><%= user.buyer_profile.companyName %></strong></p>
+                                    <p>Interested in: <strong><%= user.buyer_profile.productsNeeded.join(', ') %></strong></p>
+                                    <p> <strong><%= user.buyer_profile.preferredQuantities %></strong> buyer.</p>
+                                    <p><strong><%= user.buyer_profile.paymentReliability.toFixed(1) %>% Completion Rate</strong></p>
+                                    <p><strong><%= user.buyer_profile.past_deals %> Successful Transactions</strong></p>
+                                    <p>Rating: 
+                                        <strong>
+                                            <%= '★'.repeat(Math.floor(user.buyer_profile.rating)) %>
+                                            <%= '☆'.repeat(5 - Math.floor(user.buyer_profile.rating)) %>
+                                            (<%= user.buyer_profile.rating.toFixed(1) %>/5)
+                                        </strong>
                                     </p>
                                 </div>
                             </div>
+                            
                         <% } %>
                     <% } %>
                     
