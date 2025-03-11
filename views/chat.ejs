@@ -7,54 +7,69 @@
     <style>
         /* General Styles */
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background: #f4f4f9;
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
             margin: 0;
             padding: 0;
-        }
-
-        h2 {
-            color: #333;
-            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
         /* Chat Container */
-        #chatBox {
-            width: 90%;
-            max-width: 500px;
-            height: 400px;
-            border-radius: 10px;
-            background: #fff;
-            padding: 15px;
-            overflow-y: auto;
-            margin: 20px auto;
+        .chat-container {
+            width: 600px;
+            height: 80vh;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
             display: flex;
             flex-direction: column;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            border: none;
+            overflow: hidden;
+        }
+
+        /* Chat Header */
+        .chat-header {
+            background: #3d6a25;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Chat Messages Box */
+        #chatBox {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #f9f9f9;
         }
 
         /* Chat Messages */
         .message {
-            padding: 12px;
-            margin: 5px;
-            border-radius: 18px;
             max-width: 75%;
-            word-wrap: break-word;
+            padding: 12px 16px;
+            border-radius: 18px;
             font-size: 14px;
-            position: relative;
-            box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.1);
+            word-wrap: break-word;
         }
 
         .sent {
-            background: #DCF8C6;
+            background: #3d6a25;
+            color: white;
             align-self: flex-end;
             text-align: right;
         }
 
         .received {
-            background: #EAEAEA;
+            background: #eaeaea;
+            color: #333;
             align-self: flex-start;
             text-align: left;
         }
@@ -62,71 +77,88 @@
         .message small {
             display: block;
             font-size: 10px;
-            color: #666;
+            color: rgba(255, 255, 255, 0.8);
             margin-top: 5px;
         }
 
-        /* Chat Input & Button */
-        .chat-container {
+        .received small {
+            color: #666;
+        }
+
+        /* Chat Input Box */
+        .chat-footer {
             display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #ddd;
         }
 
         .chat-input {
             flex-grow: 1;
-            width: 70%;
-            max-width: 400px;
-            padding: 10px;
+            padding: 12px;
             border-radius: 20px;
-            border: 1px solid #ccc;
+            border: 1px solid #3d6a25;
             font-size: 14px;
             outline: none;
         }
 
         .chat-input:focus {
-            border-color: #007bff;
-            box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+            border-color: #3d6a25;
+            box-shadow: 0px 0px 6px rgba(61, 106, 37, 0.5);
         }
 
-        button {
-            background: #007bff;
+        .send-btn {
+            background: #3d6a25;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 12px 15px;
             border-radius: 20px;
             cursor: pointer;
             font-size: 14px;
+            margin-left: 10px;
             transition: 0.3s;
         }
 
-        button:hover {
-            background: #0056b3;
+        .send-btn:hover {
+            background: #2d511c;
         }
+
     </style>
 </head>
 <body>
-    <h2>Chat</h2>
-    
-    <!-- Hidden input fields to store IDs -->
-    <input type="hidden" id="senderId" value="<%= senderId %>">
-    <input type="hidden" id="receiverId" value="<%= receiverId %>">
-    <input type="hidden" id="requestId" value="<%= requestId %>">
 
-    <div id="chatBox">
-        <% messages.forEach(message => { %>
-            <div class="message <%= message.sender_id === senderId ? 'sent' : 'received' %>">
-                <strong><%= message.sender_id === senderId ? "You" : "Them" %>:</strong>
-                <%= message.message %>
-                <small><%= new Date(message.timestamp).toLocaleString() %></small>
-            </div>
-        <% }); %>
-    </div>
-
+    <!-- Chat Container -->
     <div class="chat-container">
-        <input type="text" id="messageInput" class="chat-input" placeholder="Type a message...">
-        <button id="sendBtn">Send</button>
+        
+        <!-- Chat Header -->
+        <div class="chat-header">
+            Chat with <%= receiverName %>
+        </div>
+
+        <!-- Hidden input fields to store IDs -->
+        <input type="hidden" id="senderId" value="<%= senderId %>">
+        <input type="hidden" id="receiverId" value="<%= receiverId %>">
+        <input type="hidden" id="requestId" value="<%= requestId %>">
+
+        <!-- Chat Messages -->
+        <div id="chatBox">
+            <% messages.forEach(message => { %>
+                <div class="message <%= message.sender_id === senderId ? 'sent' : 'received' %>">
+                    <strong>
+                        <%= message.sender_id === senderId ? "You" : receiverName %>:
+                    </strong>
+                    <%= message.message %>
+                    <small><%= new Date(message.timestamp).toLocaleString() %></small>
+                </div>
+            <% }); %>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-footer">
+            <input type="text" id="messageInput" class="chat-input" placeholder="Type a message...">
+            <button id="sendBtn" class="send-btn">Send</button>
+        </div>
+
     </div>
 
     <script>
@@ -139,6 +171,9 @@
             const sendBtn = document.getElementById("sendBtn");
 
             messageInput.focus(); // Auto-focus on input field
+
+            // Auto-scroll to bottom on load
+            chatBox.scrollTop = chatBox.scrollHeight;
 
             // Connect WebSocket
             const socket = new WebSocket("ws://localhost:5000");
@@ -155,7 +190,7 @@
                 if (data.type === "chat") {
                     const msgDiv = document.createElement("div");
                     msgDiv.classList.add("message", data.senderId === senderId ? "sent" : "received");
-                    msgDiv.innerHTML = `<strong>${data.senderId === senderId ? "You" : "Them"}:</strong> ${data.messageText} 
+                    msgDiv.innerHTML = `<strong>${data.senderId === senderId ? "You" : receiverName}:</strong> ${data.messageText} 
                                         <small>Just now</small>`;
                     chatBox.appendChild(msgDiv);
                     chatBox.scrollTop = chatBox.scrollHeight;
@@ -206,9 +241,8 @@
                 chatBox.scrollTop = chatBox.scrollHeight;
                 messageInput.value = "";
             }
-
         });
     </script>    
-    
+
 </body>
 </html>

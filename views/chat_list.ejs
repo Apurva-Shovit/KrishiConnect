@@ -5,43 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat List</title>
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background: #f4f4f4;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
         h2 {
             text-align: center;
-            color: #333;
+            color: #3d6a25;
+            margin-top: 20px;
+            font-size: 24px;
         }
+
+        /* Chat List Container */
         #chatList {
+            width: 100%;
             max-width: 500px;
-            margin: 0 auto;
-            background: #fff;
+            background: white;
             padding: 15px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
+
+        /* Chat Item */
         .chat-item {
             display: flex;
             align-items: center;
-            cursor: pointer;
             padding: 15px;
             border-bottom: 1px solid #ddd;
-            transition: background 0.3s;
             border-radius: 8px;
             margin-bottom: 10px;
             background: #f9f9f9;
+            transition: transform 0.2s, background 0.3s;
+            cursor: pointer;
         }
+
         .chat-item:hover {
-            background: #e6f7ff;
+            background: #eaf5e1;
+            transform: translateY(-3px);
         }
+
+        /* Avatar */
         .avatar {
-            width: 40px;
-            height: 40px;
-            background: #007bff;
-            color: #fff;
+            width: 45px;
+            height: 45px;
+            background: #3d6a25;
+            color: white;
             font-weight: bold;
             font-size: 18px;
             display: flex;
@@ -49,35 +65,51 @@
             justify-content: center;
             border-radius: 50%;
             margin-right: 15px;
+            flex-shrink: 0;
         }
+
+        /* Chat Info */
         .chat-info {
             flex-grow: 1;
         }
+
         .chat-name {
             font-size: 16px;
             font-weight: bold;
             color: #333;
             margin: 0;
         }
+
         .chat-status {
             font-size: 12px;
             color: #666;
+            margin-top: 3px;
+        }
+
+        /* Empty State */
+        .empty-message {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
+
     <h2>Chat List</h2>
+
     <div id="chatList">
         <% if (!chats || chats.length === 0) { %>
-            <p style="text-align: center; color: #666;">No active chats found.</p>
+            <p class="empty-message">No active chats found.</p>
         <% } else { %>
             <% chats.forEach(chat => { %>
-                <div class="chat-item" onclick="openChat('<%= chat.request_id %>', '<%= chat.user_id %>')">
+                <div class="chat-item" onclick="openChat('<%= chat.request_id %>', '<%= chat.chat_partner_id %>')">
                     <div class="avatar">
-                        <%= chat.name ? chat.name.charAt(0).toUpperCase() : '?' %>
+                        <%= chat.chat_partner_name ? chat.chat_partner_name.charAt(0).toUpperCase() : '?' %>
                     </div>
                     <div class="chat-info">
-                        <p class="chat-name"><%= chat.name ? chat.name : 'Unknown User' %></p>
+                        <p class="chat-name"><%= chat.chat_partner_name ? chat.chat_partner_name : 'Unknown User' %></p>
                         <p class="chat-status">Tap to open chat</p>
                     </div>
                 </div>
@@ -87,14 +119,9 @@
 
     <script>
         function openChat(requestId, receiverId) {
-            // if (!requestId || !receiverId) {
-            //     console.error("Missing requestId or receiverId", { requestId, receiverId });
-            //     alert("Error: Missing chat details.");
-            //     return;
-            // }
             window.location.href = `/chat?requestId=${encodeURIComponent(requestId)}&receiverId=${encodeURIComponent(receiverId)}`;
         }
-
     </script>
+
 </body>
 </html>
