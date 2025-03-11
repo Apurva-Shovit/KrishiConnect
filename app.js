@@ -470,4 +470,12 @@ app.post('/home/AcceptRequest', authenticateToken, async (req, res) => {
 
 
 
+
+
+app.get('/payment', (req, res) => {
+    res.render('payment');
+});
+
+
+
 app.listen(port, () => console.log(`Server running on port ${port}`));
