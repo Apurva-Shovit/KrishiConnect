@@ -111,6 +111,29 @@ app.get("/register", (req, res) => {
 app.get("/about", (req, res) => {
     res.render("about.ejs", {errorMessage : null});
 });
+ // Import database connection
+
+app.get("/profile", authenticateToken, async (req, res) => {
+    try {
+        // Fetch the farmer profile
+        const user_id = req.user.user_id;
+        const userData = await db.query(
+            "SELECT * FROM users WHERE user_id = $1",[user_id]
+        );
+
+
+        // Prepare the data for EJS rendering
+        
+        
+        // Render profile page
+        console.log(userData.rows[0]);
+        res.render("profile", { profileData: userData.rows[0] });
+    } catch (err) {
+        console.error("Error fetching user profiles:", err);
+        res.status(500).send("Server Error");
+    }
+});
+
 
 app.get("/postdemandpage", authenticateToken, (req, res) => {
     try {
@@ -123,6 +146,7 @@ app.get("/postdemandpage", authenticateToken, (req, res) => {
 
 
 
+
 app.post("/postdemand", authenticateToken, async (req, res) => {
     try {
         const {
@@ -131,34 +155,89 @@ app.post("/postdemand", authenticateToken, async (req, res) => {
             price_offered,
             delivery_deadline,
             description,
-            spendingcatagoory,
-            location
+            spendingcategory,
+            location,
         } = req.body;
 
-        const query = `
+        // Extract timeline stage data dynamically
+        let node_titles = [];
+        let node_dates = [];
+        let node_descriptions = [];
+
+        // Loop through the request body to find stage inputs dynamically
+        for (let i = 1; i <= 4; i++) { // Assuming max 4 stages from your form
+            if (req.body[`node_title${i}`] && req.body[`node_date${i}`] && req.body[`node_description${i}`]) {
+                node_titles.push(req.body[`node_title${i}`]);
+                node_dates.push(req.body[`node_date${i}`]);
+                node_descriptions.push(req.body[`node_description${i}`]);
+            }
+        }
+
+        // Insert into requests table
+        const requestQuery = `
             INSERT INTO requests (crop_name, quantity, offer_price, delivery_deadline, description, spending_category, location, total_amount, user_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING request_id;
         `;
 
-        const values = [
+        const requestValues = [
             crop_name,
             quantity,
             price_offered,
             delivery_deadline,
             description,
-            spendingcatagoory,
+            spendingcategory,
             location,
             price_offered * quantity,
-            req.user.user_id 
+            req.user.user_id
         ];
 
-        await db.query(query, values);
-        res.redirect("/home");
+        const requestResult = await db.query(requestQuery, requestValues);
+        const requestId = requestResult.rows[0].request_id; // Get inserted request ID
+
+        // Insert into demand_timeline table
+        const timelineQuery = `
+            INSERT INTO demand_timeline (request_id, stage_title, stage_date, stage_description)
+            VALUES ($1, $2, $3, $4);
+        `;
+
+        for (let i = 0; i < node_titles.length; i++) {
+            await db.query(timelineQuery, [requestId, node_titles[i], node_dates[i], node_descriptions[i]]);
+        }
+
+        res.redirect("home");
     } catch (error) {
         console.error("Error posting demand:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+app.get("/timeline/:request_id", authenticateToken, async (req, res) => {
+    try {
+        const requestId = req.params.request_id;
+
+        const query = `
+            SELECT stage_title, stage_date, stage_description
+            FROM demand_timeline
+            WHERE request_id = $1
+            ORDER BY stage_date ASC;
+        `;
+
+        const result = await db.query(query, [requestId]);
+
+        const formattedResult = result.rows.map(item => ({
+            ...item,
+            stage_date: new Date(item.stage_date).toISOString().split('T')[0]
+        }));
+
+        res.json(formattedResult);
+    } catch (error) {
+        console.error("Error fetching timeline:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+
 app.post("/reguser", async (req, res) => {
     console.log("Received registration request"); 
     console.log("Request Body:", req.body);
@@ -443,6 +522,14 @@ app.post('/home/AcceptRequest', authenticateToken, async (req, res) => {
     }
 });
 
+
+
+
+
+
+app.get('/payment', (req, res) => {
+    res.render('payment');
+});
 
 
 
