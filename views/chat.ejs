@@ -222,18 +222,6 @@
                 console.log("Sending message:", newMessage);
                 socket.send(JSON.stringify(newMessage));
 
-                try {
-                    await fetch('/storeMessage', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(newMessage)
-                    });
-                } catch (error) {
-                    console.error('Error storing message:', error);
-                }
-
                 const msgDiv = document.createElement("div");
                 msgDiv.classList.add("message", "sent");
                 msgDiv.innerHTML = `<strong>You:</strong> ${message} <small>Just now</small>`;
