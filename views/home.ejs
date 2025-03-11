@@ -58,11 +58,16 @@
                 </a>
               </li>
               <li>
-                <a href="#" class="nav-link text-white d-flex flex-column align-items-center">
-                  <i class="bi bi-chat-dots" style="font-size: 22px;"></i>
-                  Chat
+                <a id="chatLink" href="#" class="nav-link text-white d-flex flex-column align-items-center">
+                    <i class="bi bi-chat-dots" style="font-size: 22px;"></i>
+                    Chat
                 </a>
-              </li>
+            </li>
+            <script>
+                
+               
+            </script>
+            
             </ul>
             <ul class="nav col-12 col-lg-auto my-2 ms-auto my-md-0 text-small d-flex justify-content-end">
               <div class="d-flex align-items-center">
@@ -435,8 +440,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
 
     <script>
-
-
+        window.currentUser = {
+            userId : "<%= user.user_id %>"
+        }
+        let dynamicValue = `/chat_list/${window.currentUser.userId}`;
+        document.getElementById("chatLink").href = `${dynamicValue}`;
         window.onload = function () {
             const urlParams = new URLSearchParams(window.location.search);
             const filter = urlParams.get('filter');
