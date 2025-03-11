@@ -104,7 +104,7 @@
         <h4 class="mb-3 text-center">Enter Post Information</h4>
         <hr class="my-4">
         
-        <form class="needs-validation" action="/postdemand" method="POST" novalidate="">
+        <form class="needs-validation" action="/postdemand" method="POST" >
           <div class="row g-3">
               <!-- First Row: Crop Name, Quantity, Price, Delivery Deadline -->
               <div class="col-md-2">
@@ -159,25 +159,56 @@
                   <h4 class="text-center">Project Timeline</h4>
               </div>
       
-              <!-- Start Date & End Date -->
+              <!-- Start Date & End Date
               <div class="col-md-6">
                   <label for="startDate" class="form-label">Start Date</label>
                   <input type="date" class="form-control" id="startDate" name="start_date" required>
                   <div class="invalid-feedback">Select a start date.</div>
-              </div>
+              </div> -->
       
-              <div class="col-md-6">
+              <!-- <div class="col-md-6">
                   <label for="endDate" class="form-label">End Date</label>
                   <input type="date" class="form-control" id="endDate" name="end_date" required>
                   <div class="invalid-feedback">Select an end date.</div>
-              </div>
+              </div> -->
       
               <!-- Timeline Nodes -->
-              <div class="col-md-12">
+              <div class="col-md-3">
                   <label class="form-label">Project Stages</label>
-                  <div id="nodesContainer"></div>
-                  <button type="button" class="btn btn-success mt-2" id="addNode">+ Add Stage</button>
+                  <div class="node-entry border p-3 mt-2 rounded">
+                    <label class="form-label">Stage 1</label>
+                    <input type="text" class="form-control mb-2" name="node_title1" placeholder="Stage Title" required>
+                    <input type="date" class="form-control mb-2" name="node_date1" required>
+                    <textarea class="form-control mb-2" name="node_description1" placeholder="Stage Description" rows="2" required></textarea>
+                </div>
               </div>
+              <div class="col-md-3">
+                <label class="form-label">Project Stages</label>
+                <div class="node-entry border p-3 mt-2 rounded">
+                  <label class="form-label">Stage 2</label>
+                  <input type="text" class="form-control mb-2" name="node_title2" placeholder="Stage Title" required>
+                  <input type="date" class="form-control mb-2" name="node_date2" required>
+                  <textarea class="form-control mb-2" name="node_description2" placeholder="Stage Description" rows="2" required></textarea>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Project Stages</label>
+              <div class="node-entry border p-3 mt-2 rounded">
+                <label class="form-label">Stage 3</label>
+                <input type="text" class="form-control mb-2" name="node_title3" placeholder="Stage Title" required>
+                <input type="date" class="form-control mb-2" name="node_date3" required>
+                <textarea class="form-control mb-2" name="node_description3" placeholder="Stage Description" rows="2" required></textarea>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Project Stages</label>
+            <div class="node-entry border p-3 mt-2 rounded">
+              <label class="form-label">Stage 4</label>
+              <input type="text" class="form-control mb-2" name="node_title4" placeholder="Stage Title" required>
+              <input type="date" class="form-control mb-2" name="node_date4" required>
+              <textarea class="form-control mb-2" name="node_description4" placeholder="Stage Description" rows="2" required></textarea>
+          </div>
+        </div>
       
               <!-- Submit Button -->
               <div class="col-12 text-center mt-3">
