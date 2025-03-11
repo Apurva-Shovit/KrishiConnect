@@ -172,7 +172,7 @@
                 }
             });
 
-            function sendMessage() {
+            async function sendMessage() {
                 const message = messageInput.value.trim();
                 if (message === "") return;
 
@@ -184,10 +184,21 @@
                     messageText: message,
                 };
 
-                console.log("🚀 Sending message:", newMessage);
+                console.log("Sending message:", newMessage);
                 socket.send(JSON.stringify(newMessage));
 
-                // Show the message in the chatbox
+                try {
+                    await fetch('/storeMessage', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newMessage)
+                    });
+                } catch (error) {
+                    console.error('Error storing message:', error);
+                }
+
                 const msgDiv = document.createElement("div");
                 msgDiv.classList.add("message", "sent");
                 msgDiv.innerHTML = `<strong>You:</strong> ${message} <small>Just now</small>`;
@@ -195,6 +206,7 @@
                 chatBox.scrollTop = chatBox.scrollHeight;
                 messageInput.value = "";
             }
+
         });
     </script>    
     
