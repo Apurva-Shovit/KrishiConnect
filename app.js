@@ -342,6 +342,8 @@ app.get("/home", authenticateToken, async (req, res) => {
     try {
         console.log(req.user);
         const filterMyDemands = req.query.filter === 'myDemands';
+        const searchQuery = req.query.searchQuery || '';
+        const sortBy = req.query.sortBy || '';
 
         const [result, userResult] = await Promise.all([
             db.query('SELECT * FROM requests ORDER BY created_at DESC;'),
@@ -351,15 +353,25 @@ app.get("/home", authenticateToken, async (req, res) => {
         const userData = userResult.rows[0];
         const userLocation = req.user.location.loc;
 
+        let filteredRequests = result.rows
+            .filter(row =>
+                row.crop_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                row.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (row.loc && row.loc.includes(searchQuery))
+            )
+            .map(row => ({
+                ...row,
+                delivery_deadline: row.delivery_deadline.toISOString().split('T')[0],
+                posted_time: calculatePostedTime(row.created_at),
+                proposals: row.loc ? `${calculateDistance(userLocation, row.loc)} km` : 'N/A'
+            }));
 
-        let filteredRequests = result.rows.map(row => ({
-            ...row,
-            delivery_deadline: row.delivery_deadline.toISOString().split('T')[0],
-            posted_time: calculatePostedTime(row.created_at),
-            proposals: row.loc ? `${calculateDistance(userLocation, row.loc)} km` : 'N/A'
-        }));
-
-        
+        if (sortBy === 'ai_rating') {
+            filteredRequests.sort((a, b) => (b.ai_rating || 0) - (a.ai_rating || 0));
+        } else if (sortBy === 'distance') {
+            filteredRequests = filteredRequests.filter(req => req.proposals !== 'N/A')
+                .sort((a, b) => parseFloat(a.proposals) - parseFloat(b.proposals));
+        }
 
         if (filterMyDemands) {
             filteredRequests = filteredRequests.filter(request =>
@@ -375,7 +387,6 @@ app.get("/home", authenticateToken, async (req, res) => {
                 .filter(request => request.accepted_by === null)
                 .filter(request => request.user_id != userData.user_id);
         }
-        console.log(filteredRequests);
 
         res.render('home', { 
             requests: filteredRequests,
@@ -389,6 +400,7 @@ app.get("/home", authenticateToken, async (req, res) => {
 });
 
 
+
 app.get('/home/logout', (req, res) => {
     res.clearCookie('token');
     res.redirect('/login');
@@ -396,8 +408,10 @@ app.get('/home/logout', (req, res) => {
 
 app.get('/home/search', authenticateToken, (req, res) => {
     const searchQuery = req.query.query || '';
-    res.redirect(`/home?searchQuery=${encodeURIComponent(searchQuery)}`);
+    const sortBy = req.query.sortBy || '';
+    res.redirect(`/home?searchQuery=${encodeURIComponent(searchQuery)}&sortBy=${encodeURIComponent(sortBy)}`);
 });
+
 
 app.post('/submit-farmer-profile',authenticateToken, (req, res) => {
     const { location, farmSize, cropsGrown, experience, farmingMethods } = req.body;
