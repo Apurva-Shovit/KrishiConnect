@@ -3,7 +3,7 @@ KrishiConnect connects small-scale farmers with buyers, offering a secure platfo
 [![Video Demonstration](thumbnail_image_url)](https://youtu.be/kaH86pkyNGY)
 [![Video Thumbnail](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=kaH86pkyNGY)
 
-![Alt text](https://github.com/Apurva-Shovit/KrishiConnect/blob/main/WhatsApp%20Image%202025-03-11%20at%2018.53.31_7a113b86.jpg)
+![Alt text](https://github.com/Apurva-Shovit/KrishiConnect/blob/main/WhatsApp%20Image%202025-03-11%20at%2018.53.33_f549d1ff.jpg)
 
 
 ##  Tech Stack
